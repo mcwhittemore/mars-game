@@ -58,7 +58,7 @@ func NewCharacter(sheet *Sheet, pos pixel.Vec, mind func(*Character, int64)) *Ch
 }
 
 func (c *Character) ChangePose(name string) {
-	if c.pose != "" {
+	if c.pose != "" && c.pose != name {
 		pose, _ := c.getPose()
 		pose.Stop()
 	}
