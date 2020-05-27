@@ -25,7 +25,12 @@ func run() {
 		panic(err)
 	}
 
-	hero := characters.NewHero(win)
+	beings := make([]*characters.Character, 0)
+	beings = append(beings, characters.NewHero(win))
+	beings = append(beings, characters.NewRando(win, 92, win.Bounds().Center().Add(pixel.Vec{32, 32})))
+	beings = append(beings, characters.NewRando(win, 89, win.Bounds().Center().Add(pixel.Vec{-32, 32})))
+	beings = append(beings, characters.NewRando(win, 86, win.Bounds().Center().Add(pixel.Vec{-32, -32})))
+	beings = append(beings, characters.NewRando(win, 83, win.Bounds().Center().Add(pixel.Vec{32, -32})))
 
 	mapOne := NewMap(&MapOpts{
 		Sheet: groundSheet,
@@ -40,8 +45,10 @@ func run() {
 
 		mapOne.Draw(win)
 
-		hs, hm := hero.Update(1)
-		hs.Draw(win, hm)
+		for _, being := range beings {
+			bs, bm := being.Update(1)
+			bs.Draw(win, bm)
+		}
 
 		win.Update()
 	}
