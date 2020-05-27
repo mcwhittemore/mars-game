@@ -1,58 +1,20 @@
-package main
+package characters
 
 import (
-	"fmt"
+	"sheet"
+
 	"github.com/faiface/pixel"
 )
-
-type Pose struct {
-	frames    []*pixel.Sprite
-	numFrames int
-	frame     int
-	movement  pixel.Vec
-}
-
-func NewPose(fs []*pixel.Sprite, mv pixel.Vec) *Pose {
-	return &Pose{fs, len(fs), 0, mv}
-}
-
-func (p *Pose) GetMovement() pixel.Vec {
-	if p.frame == 0 {
-		return pixel.ZV
-	}
-
-	return p.movement
-}
-
-func (p *Pose) GetSprite() *pixel.Sprite {
-	return p.frames[p.frame]
-}
-
-func (p *Pose) Step() {
-	fmt.Printf("Step %d ->", p.frame)
-	if p.numFrames > 0 {
-		p.frame = p.frame + 1
-
-		if p.frame == p.numFrames {
-			p.frame = 1
-		}
-	}
-	fmt.Printf("%d\n", p.frame)
-}
-
-func (p *Pose) Stop() {
-	p.frame = 0
-}
 
 type Character struct {
 	Pos   pixel.Vec
 	pose  string
-	sheet *Sheet
+	sheet *sheet.Sheet
 	poses map[string]*Pose
 	mind  func(*Character, int64)
 }
 
-func NewCharacter(sheet *Sheet, pos pixel.Vec, mind func(*Character, int64)) *Character {
+func NewCharacter(sheet *sheet.Sheet, pos pixel.Vec, mind func(*Character, int64)) *Character {
 	poses := make(map[string]*Pose)
 	return &Character{pos, "", sheet, poses, mind}
 }

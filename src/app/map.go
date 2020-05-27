@@ -1,11 +1,13 @@
 package main
 
 import (
+	"sheet"
+
 	"github.com/faiface/pixel"
 )
 
 type MapOpts struct {
-	Sheet *Sheet
+	Sheet *sheet.Sheet
 	Tiles []*pixel.Vec
 	Grid  [][]int
 	Start pixel.Vec
@@ -13,7 +15,7 @@ type MapOpts struct {
 
 func NewMap(opts *MapOpts) *pixel.Batch {
 
-	dim := opts.Sheet.dim
+	dim := opts.Sheet.GetDim()
 
 	sprites := make([]*pixel.Sprite, 0)
 

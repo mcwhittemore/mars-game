@@ -1,4 +1,4 @@
-package main
+package sheet
 
 import (
 	"github.com/faiface/pixel"
@@ -10,6 +10,10 @@ type Sheet struct {
 	base  pixel.Vec
 	scale float64
 	dim   float64
+}
+
+func (s *Sheet) GetDim() float64 {
+	return s.dim
 }
 
 func NewSheet(name string, s pixel.Vec, off pixel.Vec, dim float64) (*Sheet, error) {
