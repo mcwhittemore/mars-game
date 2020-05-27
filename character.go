@@ -92,6 +92,7 @@ func (c *Character) Update(dt int64) (*pixel.Sprite, pixel.Matrix) {
 
 	pose, isLeft := c.getPose()
 	sprite := pose.GetSprite()
+
 	mov := pose.GetMovement()
 
 	matrix := c.sheet.IM()

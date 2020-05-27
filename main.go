@@ -30,12 +30,6 @@ func run() {
 
 	second := time.Tick(200 * time.Millisecond)
 	hero := NewCharacter(characterSheet, win.Bounds().Center(), func(c *Character, dt int64) {
-		select {
-		case <-second:
-			c.Step()
-		default:
-		}
-
 		if win.JustPressed(pixelgl.KeyD) {
 			c.ChangePose("side")
 		} else if win.JustPressed(pixelgl.KeyA) {
@@ -45,6 +39,17 @@ func run() {
 		} else if win.JustPressed(pixelgl.KeyW) {
 			c.ChangePose("up")
 		}
+
+		if win.Pressed(pixelgl.KeyD) || win.Pressed(pixelgl.KeyA) || win.Pressed(pixelgl.KeyS) || win.Pressed(pixelgl.KeyW) {
+			select {
+			case <-second:
+				c.Step()
+			default:
+			}
+		} else {
+			c.Stop()
+		}
+
 	})
 
 	var offsetH, offsetV float64
