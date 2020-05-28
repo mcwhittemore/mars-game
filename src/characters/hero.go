@@ -9,14 +9,14 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-func NewHero(win *pixelgl.Window) *Character {
+func NewHero() *Character {
 	characterSheet, err := sheet.NewSheet("characters.png", pixel.Vec{18, 20}, pixel.Vec{0, 2}, 64)
 	if err != nil {
 		panic(err)
 	}
 
 	second := time.Tick(200 * time.Millisecond)
-	hero := NewCharacter(characterSheet, win.Bounds().Center(), func(c *Character, dt int64) {
+	hero := NewCharacter(characterSheet, pixel.ZV, func(c *Character, dt float64, win MindInput) {
 		if win.JustPressed(pixelgl.KeyD) {
 			c.ChangePose("side")
 		} else if win.JustPressed(pixelgl.KeyA) {
@@ -43,9 +43,9 @@ func NewHero(win *pixelgl.Window) *Character {
 	offsetH = 2 / 18
 	offsetV = 2 / 20
 
-	hero.AddPose("down", []pixel.Vec{{1, 95}, {2, 95}, {3 + offsetH, 95 - offsetV}, {4 + offsetH, 95}, {0, 95}}, pixel.Vec{0, -1})
-	hero.AddPose("side", []pixel.Vec{{1, 96}, {2, 96}, {3 + offsetH, 96 - offsetV}, {4 + offsetH, 96}, {0, 96}}, pixel.Vec{1, 0})
-	hero.AddPose("up", []pixel.Vec{{1, 97}, {2, 97}, {3 + offsetH, 97 - offsetV}, {4 + offsetH, 97}, {0, 97}}, pixel.Vec{0, 1})
+	hero.AddPose("down", []pixel.Vec{{1, 95}, {2, 95}, {3 + offsetH, 95 - offsetV}, {4 + offsetH, 95}, {0, 95}}, pixel.Vec{0, -200})
+	hero.AddPose("side", []pixel.Vec{{1, 96}, {2, 96}, {3 + offsetH, 96 - offsetV}, {4 + offsetH, 96}, {0, 96}}, pixel.Vec{200, 0})
+	hero.AddPose("up", []pixel.Vec{{1, 97}, {2, 97}, {3 + offsetH, 97 - offsetV}, {4 + offsetH, 97}, {0, 97}}, pixel.Vec{0, 200})
 
 	hero.ChangePose("down")
 

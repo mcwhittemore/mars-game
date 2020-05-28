@@ -11,10 +11,10 @@ type Character struct {
 	pose  string
 	sheet *sheet.Sheet
 	poses map[string]*Pose
-	mind  func(*Character, int64)
+	mind  MindFunc
 }
 
-func NewCharacter(sheet *sheet.Sheet, pos pixel.Vec, mind func(*Character, int64)) *Character {
+func NewCharacter(sheet *sheet.Sheet, pos pixel.Vec, mind MindFunc) *Character {
 	poses := make(map[string]*Pose)
 	return &Character{pos, "", sheet, poses, mind}
 }
@@ -49,8 +49,8 @@ func (c *Character) getPose() (*Pose, bool) {
 	return pose, false
 }
 
-func (c *Character) Update(dt int64) (*pixel.Sprite, pixel.Matrix) {
-	c.mind(c, dt)
+func (c *Character) Update(dt float64, win MindInput) (*pixel.Sprite, pixel.Matrix) {
+	c.mind(c, dt, win)
 
 	pose, isLeft := c.getPose()
 	sprite := pose.GetSprite()
