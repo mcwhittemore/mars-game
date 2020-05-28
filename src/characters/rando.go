@@ -20,8 +20,15 @@ func NewRando(startRow float64, startPos pixel.Vec) *Character {
 	moves := []string{"down", "up", "side", "left-side"}
 
 	rando := NewCharacter(characterSheet, startPos, func(c *Character, dt float64, win MindInput) {
+		if c.Collided {
+			c.ChangePose("down")
+			c.Stop()
+			c.Pos = pixel.ZV
+		}
+
 		select {
 		case <-second:
+			c.Collided = false
 			c.ChangePose(moves[rand.Int()%4])
 			if rand.Int()%2 == 0 {
 				c.Step()

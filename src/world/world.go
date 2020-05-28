@@ -23,6 +23,19 @@ func (w *World) Pressed(but pixelgl.Button) bool {
 	return w.win.Pressed(but)
 }
 
+func (w *World) GetCollideRect(rect pixel.Rect, thing interface{}) pixel.Rect {
+	out := pixel.ZR
+
+	if thing != interface{}(w.hero) {
+		out = w.hero.PosBounds(w.hero.Pos).Intersect(rect)
+		if out.String() == pixel.ZR.String() {
+			return out
+		}
+	}
+
+	return out
+}
+
 func (w *World) Update(dt float64) {
 	cam := pixel.IM.Moved(w.win.Bounds().Center().Sub(w.camPos))
 	w.win.SetMatrix(cam)
@@ -30,11 +43,12 @@ func (w *World) Update(dt float64) {
 	activeMap := w.maps[0]
 	activeMap.Draw(w.win)
 
+	hs, hm := w.hero.Update(dt, w)
+	hs.Draw(w.win, hm)
+
 	for _, being := range w.npcs {
 		bs, bm := being.Update(dt, w)
 		bs.Draw(w.win, bm)
 	}
 
-	hs, hm := w.hero.Update(dt, w)
-	hs.Draw(w.win, hm)
 }

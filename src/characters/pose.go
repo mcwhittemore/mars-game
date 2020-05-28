@@ -15,6 +15,10 @@ func NewPose(fs []*pixel.Sprite, mv pixel.Vec) *Pose {
 	return &Pose{fs, len(fs), 0, mv}
 }
 
+func (p *Pose) Bounds() pixel.Rect {
+	return p.GetSprite().Frame()
+}
+
 func (p *Pose) GetMovement() pixel.Vec {
 	if p.frame == 0 {
 		return pixel.ZV
