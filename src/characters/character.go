@@ -3,8 +3,6 @@ package characters
 import (
 	"sheet"
 
-	"fmt"
-
 	"github.com/faiface/pixel"
 )
 
@@ -81,26 +79,9 @@ func (c *Character) Update(dt float64, win MindInput) (*pixel.Sprite, pixel.Matr
 
 	nextPos := c.Pos.Add(mov.Scaled(dt))
 
-	charBox := c.PosBounds(nextPos)
-	hitrect := win.GetCollideRect(charBox, c)
-
-	ct := 0
-	for hitrect.String() != pixel.ZR.String() {
+	nextPos, hadHit := adjustPosForCollison(c, nextPos, c.Pos, c.PosBounds, win.GetCollideRect)
+	if hadHit {
 		c.Collided = true
-		ln := pixel.L(c.Pos, nextPos)
-		rev := ln.IntersectRect(hitrect)
-		nextPos = nextPos.Add(rev)
-		charBox = c.PosBounds(nextPos)
-		hitrect = win.GetCollideRect(charBox, c)
-
-		if ct == 10 || ct == 20 {
-			fmt.Printf("%v, %v, %v\n", &c, charBox, hitrect)
-		}
-		if ct > 21 {
-			nextPos = c.Pos
-			break
-		}
-		ct++
 	}
 
 	c.Pos = nextPos
