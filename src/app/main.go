@@ -32,6 +32,7 @@ func run() {
 		win.Clear(colornames.Greenyellow)
 
 		mars.Update(dt)
+		mars.DrawHitBoxes()
 
 		win.Update()
 	}

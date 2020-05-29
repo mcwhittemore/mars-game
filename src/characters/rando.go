@@ -23,7 +23,7 @@ func NewRando(startRow float64, startPos pixel.Vec) *Character {
 		if c.Collided {
 			c.ChangePose("down")
 			c.Stop()
-			c.Pos = pixel.ZV
+			c.Pos = pixel.V(75, 75)
 		}
 
 		select {

@@ -56,8 +56,10 @@ func (c *Character) PosBounds(pos pixel.Vec) pixel.Rect {
 	bds := pose.Bounds()
 	bds.Min = im.Project(bds.Min)
 	bds.Max = im.Project(bds.Max)
+	w := (bds.Max.X - bds.Min.X) / 2
+	h := (bds.Max.Y - bds.Min.Y) / 2
 
-	return bds.Moved(pos)
+	return pixel.R(pos.X-w, pos.Y-h, pos.X+w, pos.Y+h)
 }
 
 func (c *Character) Update(dt float64, win MindInput) (*pixel.Sprite, pixel.Matrix) {

@@ -4,6 +4,7 @@ import (
 	"characters"
 
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 )
 
@@ -28,12 +29,38 @@ func (w *World) GetCollideRect(rect pixel.Rect, thing interface{}) pixel.Rect {
 
 	if thing != interface{}(w.hero) {
 		out = w.hero.PosBounds(w.hero.Pos).Intersect(rect)
-		if out.String() == pixel.ZR.String() {
+		if out != pixel.ZR {
 			return out
 		}
 	}
 
+	for _, being := range w.npcs {
+		if thing != interface{}(being) {
+			out = being.PosBounds(being.Pos).Intersect(rect)
+			if out != pixel.ZR {
+				return out
+			}
+		}
+	}
+
 	return out
+}
+
+func (w *World) DrawHitBoxes() {
+	imd := imdraw.New(nil)
+	imd.Color = pixel.RGB(1, 0, 0)
+
+	hb := w.hero.PosBounds(w.hero.Pos)
+	imd.Push(hb.Min, hb.Max)
+	imd.Rectangle(2)
+
+	for _, being := range w.npcs {
+		bb := being.PosBounds(being.Pos)
+		imd.Push(bb.Min, bb.Max)
+		imd.Rectangle(2)
+	}
+
+	imd.Draw(w.win)
 }
 
 func (w *World) Update(dt float64) {
@@ -50,5 +77,4 @@ func (w *World) Update(dt float64) {
 		bs, bm := being.Update(dt, w)
 		bs.Draw(w.win, bm)
 	}
-
 }
