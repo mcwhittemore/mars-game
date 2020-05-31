@@ -24,13 +24,13 @@ func (w *World) Pressed(but pixelgl.Button) bool {
 	return w.win.Pressed(but)
 }
 
-func (w *World) GetCollideRect(rect pixel.Rect, thing interface{}) pixel.Rect {
-	out := pixel.ZR
+func (w *World) GetCollideRect(rect pixel.Rect, thing interface{}) (pixel.Rect, *characters.Character) {
+	var out pixel.Rect
 
 	if thing != interface{}(w.hero) {
 		out = w.hero.PosBounds(w.hero.Pos).Intersect(rect)
 		if out != pixel.ZR {
-			return out
+			return out, w.hero
 		}
 	}
 
@@ -38,12 +38,12 @@ func (w *World) GetCollideRect(rect pixel.Rect, thing interface{}) pixel.Rect {
 		if thing != interface{}(being) {
 			out = being.PosBounds(being.Pos).Intersect(rect)
 			if out != pixel.ZR {
-				return out
+				return out, being
 			}
 		}
 	}
 
-	return out
+	return pixel.ZR, nil
 }
 
 func (w *World) DrawHitBoxes() {
@@ -59,6 +59,9 @@ func (w *World) DrawHitBoxes() {
 		imd.Push(bb.Min, bb.Max)
 		imd.Rectangle(2)
 	}
+
+	imd.Push(pixel.V(188, 200), pixel.V(388, 400))
+	imd.Rectangle(2)
 
 	imd.Draw(w.win)
 }

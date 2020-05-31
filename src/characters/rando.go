@@ -19,23 +19,31 @@ func NewRando(startRow float64, startPos pixel.Vec) *Character {
 
 	moves := []string{"down", "up", "side", "left-side"}
 
+	safe := pixel.R(188, 200, 388, 400)
 	rando := NewCharacter(characterSheet, startPos, func(c *Character, dt float64, win MindInput) {
-		if c.Collided {
-			c.ChangePose("down")
-			c.Stop()
-			c.Pos = pixel.V(75, 75)
-		}
-
 		select {
 		case <-second:
-			c.Collided = false
 			c.ChangePose(moves[rand.Int()%4])
-			if rand.Int()%2 == 0 {
-				c.Step()
-			} else {
+			if rand.Int()%4 == 0 {
 				c.Stop()
+			} else {
+				c.Step()
 			}
 		default:
+		}
+
+		nextPos := c.GetNextPos(dt)
+
+		isSafe := c.Hits(safe)
+		if isSafe {
+			c.Pos = nextPos
+			return
+		}
+
+		selfbox := c.PosBounds(nextPos)
+		_, subject := win.GetCollideRect(selfbox, interface{}(c))
+		if subject == nil {
+			c.Pos = nextPos
 		}
 	})
 

@@ -13,7 +13,7 @@ import (
 func run() {
 	cfg := pixelgl.WindowConfig{
 		Title:  "Mars Game!",
-		Bounds: pixel.R(0, 0, 1024, 768),
+		Bounds: pixel.R(0, 0, 608, 608),
 		VSync:  true,
 	}
 
