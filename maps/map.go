@@ -1,7 +1,7 @@
 package maps
 
 import (
-	"sheet"
+	"app/sheet"
 
 	"github.com/faiface/pixel"
 )

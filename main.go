@@ -1,12 +1,13 @@
 package main
 
 import (
-	"world"
+	"app/world"
 
 	"time"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/markbates/pkger"
 	"golang.org/x/image/colornames"
 )
 
@@ -39,5 +40,7 @@ func run() {
 }
 
 func main() {
+	pkger.Include("/characters.png")
+	pkger.Include("/crater.png")
 	pixelgl.Run(run)
 }

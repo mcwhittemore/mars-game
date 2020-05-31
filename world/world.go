@@ -1,7 +1,7 @@
 package world
 
 import (
-	"characters"
+	"app/characters"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"

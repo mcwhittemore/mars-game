@@ -1,9 +1,9 @@
 package world
 
 import (
-	"characters"
-	"maps"
-	"sheet"
+	"app/characters"
+	"app/maps"
+	"app/sheet"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"

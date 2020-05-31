@@ -1,7 +1,7 @@
 package characters
 
 import (
-	"sheet"
+	"app/sheet"
 
 	"math/rand"
 	"time"
