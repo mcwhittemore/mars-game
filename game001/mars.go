@@ -1,15 +1,16 @@
-package world
+package game001
 
 import (
 	"app/characters"
 	"app/maps"
 	"app/sheet"
+	"app/world"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 )
 
-func NewMars(win *pixelgl.Window) *World {
+func NewMars(win *pixelgl.Window) *world.World {
 
 	groundSheet, err := sheet.NewSheet("crater.png", pixel.Vec{20, 20}, pixel.ZV, 64)
 	if err != nil {
@@ -18,12 +19,12 @@ func NewMars(win *pixelgl.Window) *World {
 
 	safe := pixel.R(188, 200, 388, 400)
 	npcs := make([]*characters.Character, 0)
-	npcs = append(npcs, characters.NewRando(92, safe.Center()))
-	npcs = append(npcs, characters.NewRando(89, safe.Center()))
-	npcs = append(npcs, characters.NewRando(86, safe.Center()))
-	npcs = append(npcs, characters.NewRando(83, safe.Center()))
+	npcs = append(npcs, NewRando(92, safe.Center()))
+	npcs = append(npcs, NewRando(89, safe.Center()))
+	npcs = append(npcs, NewRando(86, safe.Center()))
+	npcs = append(npcs, NewRando(83, safe.Center()))
 
-	hero := characters.NewHero()
+	hero := NewHero()
 
 	mapOne := maps.NewMap(&maps.MapOpts{
 		Sheet: groundSheet,
@@ -43,5 +44,5 @@ func NewMars(win *pixelgl.Window) *World {
 		Start: pixel.ZV,
 	})
 
-	return &World{[]*pixel.Batch{mapOne}, npcs, hero, win.Bounds().Center(), win}
+	return &world.World{[]*pixel.Batch{mapOne}, npcs, hero, win.Bounds().Center(), win}
 }

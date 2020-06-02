@@ -21,7 +21,7 @@ func NewCharacter(sheet *sheet.Sheet, pos pixel.Vec, mind MindFunc) *Character {
 
 func (c *Character) ChangePose(name string) {
 	if c.pose != "" && c.pose != name {
-		pose, _ := c.getPose()
+		pose, _ := c.GetPose()
 		pose.Stop()
 	}
 	c.pose = name
@@ -34,7 +34,7 @@ func (c *Character) AddPose(name string, f []pixel.Vec, mv pixel.Vec) {
 	c.poses[name] = NewPose(frames, mv)
 }
 
-func (c *Character) getPose() (*Pose, bool) {
+func (c *Character) GetPose() (*Pose, bool) {
 	if len(c.pose) < 5 {
 		pose := c.poses[c.pose]
 		return pose, false
@@ -51,7 +51,7 @@ func (c *Character) getPose() (*Pose, bool) {
 
 func (c *Character) PosBounds(pos pixel.Vec) pixel.Rect {
 	im := c.sheet.IM()
-	pose, _ := c.getPose()
+	pose, _ := c.GetPose()
 	bds := pose.Bounds()
 	bds.Min = im.Project(bds.Min)
 	bds.Max = im.Project(bds.Max)
@@ -74,7 +74,7 @@ func (c *Character) DropNear(pos pixel.Vec, findCollision FindCollision) bool {
 }
 
 func (c *Character) GetNextPos(dt float64) pixel.Vec {
-	pose, isLeft := c.getPose()
+	pose, isLeft := c.GetPose()
 	mov := pose.GetMovement()
 	flip := pixel.V(-1, 1)
 	if isLeft {
@@ -87,7 +87,7 @@ func (c *Character) GetNextPos(dt float64) pixel.Vec {
 func (c *Character) Update(dt float64, win MindInput) (*pixel.Sprite, pixel.Matrix) {
 	c.mind(c, dt, win)
 
-	pose, isLeft := c.getPose()
+	pose, isLeft := c.GetPose()
 	sprite := pose.GetSprite()
 
 	matrix := c.sheet.IM()
@@ -102,11 +102,11 @@ func (c *Character) Update(dt float64, win MindInput) (*pixel.Sprite, pixel.Matr
 }
 
 func (c *Character) Step() {
-	pose, _ := c.getPose()
+	pose, _ := c.GetPose()
 	pose.Step()
 }
 
 func (c *Character) Stop() {
-	pose, _ := c.getPose()
+	pose, _ := c.GetPose()
 	pose.Stop()
 }

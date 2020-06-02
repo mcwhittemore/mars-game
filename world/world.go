@@ -9,32 +9,32 @@ import (
 )
 
 type World struct {
-	maps   []*pixel.Batch
-	npcs   []*characters.Character
-	hero   *characters.Character
-	camPos pixel.Vec
-	win    *pixelgl.Window
+	Maps   []*pixel.Batch
+	NPCs   []*characters.Character
+	Hero   *characters.Character
+	CapPos pixel.Vec
+	Win    *pixelgl.Window
 }
 
 func (w *World) JustPressed(but pixelgl.Button) bool {
-	return w.win.JustPressed(but)
+	return w.Win.JustPressed(but)
 }
 
 func (w *World) Pressed(but pixelgl.Button) bool {
-	return w.win.Pressed(but)
+	return w.Win.Pressed(but)
 }
 
 func (w *World) GetCollideRect(rect pixel.Rect, thing interface{}) (pixel.Rect, *characters.Character) {
 	var out pixel.Rect
 
-	if thing != interface{}(w.hero) {
-		out = w.hero.PosBounds(w.hero.Pos).Intersect(rect)
+	if thing != interface{}(w.Hero) {
+		out = w.Hero.PosBounds(w.Hero.Pos).Intersect(rect)
 		if out != pixel.ZR {
-			return out, w.hero
+			return out, w.Hero
 		}
 	}
 
-	for _, being := range w.npcs {
+	for _, being := range w.NPCs {
 		if thing != interface{}(being) {
 			out = being.PosBounds(being.Pos).Intersect(rect)
 			if out != pixel.ZR {
@@ -50,34 +50,31 @@ func (w *World) DrawHitBoxes() {
 	imd := imdraw.New(nil)
 	imd.Color = pixel.RGB(1, 0, 0)
 
-	hb := w.hero.PosBounds(w.hero.Pos)
+	hb := w.Hero.PosBounds(w.Hero.Pos)
 	imd.Push(hb.Min, hb.Max)
 	imd.Rectangle(2)
 
-	for _, being := range w.npcs {
+	for _, being := range w.NPCs {
 		bb := being.PosBounds(being.Pos)
 		imd.Push(bb.Min, bb.Max)
 		imd.Rectangle(2)
 	}
 
-	imd.Push(pixel.V(188, 200), pixel.V(388, 400))
-	imd.Rectangle(2)
-
-	imd.Draw(w.win)
+	imd.Draw(w.Win)
 }
 
 func (w *World) Update(dt float64) {
-	cam := pixel.IM.Moved(w.win.Bounds().Center().Sub(w.camPos))
-	w.win.SetMatrix(cam)
+	cam := pixel.IM.Moved(w.Win.Bounds().Center().Sub(w.CapPos))
+	w.Win.SetMatrix(cam)
 
-	activeMap := w.maps[0]
-	activeMap.Draw(w.win)
+	activeMap := w.Maps[0]
+	activeMap.Draw(w.Win)
 
-	hs, hm := w.hero.Update(dt, w)
-	hs.Draw(w.win, hm)
+	hs, hm := w.Hero.Update(dt, w)
+	hs.Draw(w.Win, hm)
 
-	for _, being := range w.npcs {
+	for _, being := range w.NPCs {
 		bs, bm := being.Update(dt, w)
-		bs.Draw(w.win, bm)
+		bs.Draw(w.Win, bm)
 	}
 }

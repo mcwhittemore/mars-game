@@ -1,6 +1,7 @@
-package characters
+package game001
 
 import (
+	"app/characters"
 	"app/sheet"
 
 	"math/rand"
@@ -9,7 +10,7 @@ import (
 	"github.com/faiface/pixel"
 )
 
-func NewRando(startRow float64, startPos pixel.Vec) *Character {
+func NewRando(startRow float64, startPos pixel.Vec) *characters.Character {
 	characterSheet, err := sheet.NewSheet("characters.png", pixel.Vec{18, 20}, pixel.Vec{0, 2}, 64)
 	if err != nil {
 		panic(err)
@@ -20,7 +21,7 @@ func NewRando(startRow float64, startPos pixel.Vec) *Character {
 	moves := []string{"down", "up", "side", "left-side"}
 
 	safe := pixel.R(188, 200, 388, 400)
-	rando := NewCharacter(characterSheet, startPos, func(c *Character, dt float64, win MindInput) {
+	rando := characters.NewCharacter(characterSheet, startPos, func(c *characters.Character, dt float64, win characters.MindInput) {
 		select {
 		case <-second:
 			c.ChangePose(moves[rand.Int()%4])

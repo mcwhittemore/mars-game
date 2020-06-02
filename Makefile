@@ -1,5 +1,7 @@
 
 $(pkged.go):
+
+pkged.go:
 	pkger
 
 run: pkged.go

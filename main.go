@@ -1,8 +1,11 @@
 package main
 
 import (
+	"app/game001"
+	"app/game002"
 	"app/world"
 
+	"os"
 	"time"
 
 	"github.com/faiface/pixel"
@@ -23,7 +26,19 @@ func run() {
 		panic(err)
 	}
 
-	mars := world.NewMars(win)
+	id := "2"
+	var game *world.World
+	if len(os.Args) == 2 {
+		id = os.Args[1]
+	}
+
+	if id == "1" {
+		game = game001.NewMars(win)
+	} else if id == "2" {
+		game = game002.NewMars(win)
+	} else {
+		panic("Unexpected game trying to load: " + id)
+	}
 
 	last := time.Now()
 	for !win.Closed() {
@@ -32,8 +47,8 @@ func run() {
 		last = time.Now()
 		win.Clear(colornames.Greenyellow)
 
-		mars.Update(dt)
-		mars.DrawHitBoxes()
+		game.Update(dt)
+		game.DrawHitBoxes()
 
 		win.Update()
 	}
