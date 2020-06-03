@@ -27,8 +27,9 @@ func NewMap(opts *MapOpts) *pixel.Batch {
 
 	right := pixel.Vec{dim, 0}
 
+	nr := len(opts.Grid) - 1
 	for y, row := range opts.Grid {
-		place := opts.Start.Add(pixel.Vec{0, float64(y) * dim})
+		place := opts.Start.Add(pixel.Vec{0, float64(nr-y) * dim})
 		for _, tileId := range row {
 			sprites[tileId].Draw(batch, opts.Sheet.IM().Moved(place))
 			place = place.Add(right)
