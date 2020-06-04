@@ -16,8 +16,8 @@ func NewHero() *characters.Character {
 		panic(err)
 	}
 
-	safe := pixel.R(188, 200, 388, 400)
 	second := time.Tick(200 * time.Millisecond)
+	safe := pixel.R(188, 200, 388, 400)
 	hero := characters.NewCharacter(characterSheet, safe.Center(), func(c *characters.Character, dt float64, win characters.MindInput) {
 		if win.JustPressed(pixelgl.KeyD) {
 			c.ChangePose("side")
@@ -47,19 +47,8 @@ func NewHero() *characters.Character {
 		}
 
 		c.Pos = c.Pos.Add(mov.Scaled(dt))
+		win.KeepInView(c.Pos, mov.Scaled(dt), 64)
 
-		isSafe := c.Hits(safe)
-		if isSafe {
-			return
-		}
-
-		selfbox := c.PosBounds(c.Pos)
-		_, subject := win.GetCollideRect(selfbox, interface{}(c))
-
-		for subject != nil {
-			subject.DropNear(safe.Center(), win.GetCollideRect)
-			_, subject = win.GetCollideRect(selfbox, interface{}(c))
-		}
 	})
 
 	var offsetH, offsetV float64

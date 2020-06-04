@@ -12,7 +12,7 @@ type World struct {
 	Maps   []*pixel.Batch
 	NPCs   []*characters.Character
 	Hero   *characters.Character
-	CapPos pixel.Vec
+	CamPos pixel.Vec
 	Win    *pixelgl.Window
 }
 
@@ -63,8 +63,40 @@ func (w *World) DrawHitBoxes() {
 	imd.Draw(w.Win)
 }
 
+func (w *World) KeepInView(pos pixel.Vec, mov pixel.Vec, buffer float64) {
+	cam := w.GetCamPos()
+	viewbox := w.GetViewBox().Edges()
+	for _, edge := range viewbox {
+		closest := edge.Closest(pos)
+		dis := pixel.L(pos, closest).Len()
+		if dis < buffer {
+			w.SetCamPos(cam.Add(mov))
+			break
+		}
+	}
+}
+
+func (w *World) GetViewBox() *pixel.Rect {
+	bds := w.Win.Bounds()
+	cam := pixel.IM.Moved(w.Win.Bounds().Center().Sub(w.CamPos))
+
+	return &pixel.Rect{
+		Min: cam.Unproject(bds.Min),
+		Max: cam.Unproject(bds.Max),
+	}
+
+}
+
+func (w *World) GetCamPos() pixel.Vec {
+	return w.CamPos
+}
+
+func (w *World) SetCamPos(pos pixel.Vec) {
+	w.CamPos = pos
+}
+
 func (w *World) Update(dt float64) {
-	cam := pixel.IM.Moved(w.Win.Bounds().Center().Sub(w.CapPos))
+	cam := pixel.IM.Moved(w.Win.Bounds().Center().Sub(w.CamPos))
 	w.Win.SetMatrix(cam)
 
 	activeMap := w.Maps[0]
