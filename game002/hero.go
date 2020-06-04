@@ -46,7 +46,12 @@ func NewHero() *characters.Character {
 			mov = mov.ScaledXY(flip)
 		}
 
-		c.Pos = c.Pos.Add(mov.Scaled(dt))
+		nextPos := c.Pos.Add(mov.Scaled(dt))
+
+		if win.IsObstacle(nextPos) == false {
+			c.Pos = nextPos
+		}
+
 		win.KeepInView(c.Pos, mov.Scaled(dt), 64)
 
 	})

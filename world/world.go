@@ -2,6 +2,7 @@ package world
 
 import (
 	"app/characters"
+	"app/maps"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
@@ -9,7 +10,7 @@ import (
 )
 
 type World struct {
-	Maps   []*pixel.Batch
+	Maps   []*maps.Map
 	NPCs   []*characters.Character
 	Hero   *characters.Character
 	CamPos pixel.Vec
@@ -63,36 +64,29 @@ func (w *World) DrawHitBoxes() {
 	imd.Draw(w.Win)
 }
 
-func (w *World) KeepInView(pos pixel.Vec, mov pixel.Vec, buffer float64) {
-	cam := w.GetCamPos()
-	viewbox := w.GetViewBox().Edges()
-	for _, edge := range viewbox {
-		closest := edge.Closest(pos)
-		dis := pixel.L(pos, closest).Len()
-		if dis < buffer {
-			w.SetCamPos(cam.Add(mov))
-			break
-		}
-	}
+func (w *World) IsObstacle(pos pixel.Vec) bool {
+	activeMap := w.Maps[0]
+	return activeMap.IsObstacle(pos)
 }
 
-func (w *World) GetViewBox() *pixel.Rect {
+func (w *World) KeepInView(pos pixel.Vec, mov pixel.Vec, buffer float64) {
 	bds := w.Win.Bounds()
 	cam := pixel.IM.Moved(w.Win.Bounds().Center().Sub(w.CamPos))
 
-	return &pixel.Rect{
+	viewBox := pixel.Rect{
 		Min: cam.Unproject(bds.Min),
 		Max: cam.Unproject(bds.Max),
 	}
 
-}
-
-func (w *World) GetCamPos() pixel.Vec {
-	return w.CamPos
-}
-
-func (w *World) SetCamPos(pos pixel.Vec) {
-	w.CamPos = pos
+	viewbox := viewBox.Edges()
+	for _, edge := range viewbox {
+		closest := edge.Closest(pos)
+		dis := pixel.L(pos, closest).Len()
+		if dis < buffer {
+			w.CamPos = w.CamPos.Add(mov)
+			break
+		}
+	}
 }
 
 func (w *World) Update(dt float64) {
@@ -100,7 +94,7 @@ func (w *World) Update(dt float64) {
 	w.Win.SetMatrix(cam)
 
 	activeMap := w.Maps[0]
-	activeMap.Draw(w.Win)
+	activeMap.Render.Draw(w.Win)
 
 	hs, hm := w.Hero.Update(dt, w)
 	hs.Draw(w.Win, hm)
