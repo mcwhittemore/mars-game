@@ -12,7 +12,7 @@ import (
 
 func NewMars(win *pixelgl.Window) *world.World {
 
-	groundSheet, err := sheet.NewSheet("crater.png", pixel.Vec{20, 20}, pixel.ZV, 64)
+	groundSheet, err := sheet.NewSheet("crater.png", pixel.Vec{X: 20, Y: 20}, pixel.ZV, 64)
 	if err != nil {
 		panic(err)
 	}
@@ -21,7 +21,8 @@ func NewMars(win *pixelgl.Window) *world.World {
 
 	mapOne := maps.NewMap(&maps.MapOpts{
 		Sheet: groundSheet,
-		Tiles: []*pixel.Vec{{2, 6}, {0, 4}, {2, 4}, {4, 4}, {4, 6}, {4, 8}, {2, 8}, {0, 8}, {0, 6}, {2, 0}, {4, 0}, {4, 2}, {2, 2}},
+		Tiles: []*maps.Tile{{2, 6, 0}, {0, 4, 0}, {2, 4, 0}, {4, 4, 0}, {4, 6, 0}, {4, 8, 0}, {2, 8, 0}, {0, 8, 0}, {0, 6, 0}, {2, 0, 0}, {4, 0, 0}, {4, 2, 0}, {2, 2, 0}},
+
 		// 0: empty
 		// 1: |_
 		// 2: __
