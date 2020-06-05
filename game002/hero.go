@@ -17,8 +17,7 @@ func NewHero() *characters.Character {
 	}
 
 	second := time.Tick(200 * time.Millisecond)
-	safe := pixel.R(188, 200, 388, 400)
-	hero := characters.NewCharacter(characterSheet, safe.Center(), func(c *characters.Character, dt float64, win characters.MindInput) {
+	hero := characters.NewCharacter(characterSheet, pixel.V(288, 300), func(c *characters.Character, dt float64, win characters.MindInput) {
 		if win.JustPressed(pixelgl.KeyD) {
 			c.ChangePose("side")
 		} else if win.JustPressed(pixelgl.KeyA) {
@@ -52,7 +51,7 @@ func NewHero() *characters.Character {
 			c.Pos = nextPos
 		}
 
-		win.KeepInView(c.Pos, mov.Scaled(dt), 64)
+		win.KeepInView(c.Pos, mov.Scaled(dt), 200)
 
 	})
 

@@ -11,6 +11,7 @@ type MindInput interface {
 	GetCollideRect(pixel.Rect, interface{}) (pixel.Rect, *Character)
 	KeepInView(pixel.Vec, pixel.Vec, float64)
 	IsObstacle(pixel.Vec) bool
+	GetHeroPos() pixel.Vec
 }
 
 type MindFunc func(*Character, float64, MindInput)

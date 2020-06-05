@@ -17,6 +17,10 @@ type World struct {
 	Win    *pixelgl.Window
 }
 
+func (w *World) GetHeroPos() pixel.Vec {
+	return w.Hero.Pos
+}
+
 func (w *World) JustPressed(but pixelgl.Button) bool {
 	return w.Win.JustPressed(but)
 }

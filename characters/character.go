@@ -19,6 +19,16 @@ func NewCharacter(sheet *sheet.Sheet, pos pixel.Vec, mind MindFunc) *Character {
 	return &Character{pos, "", sheet, poses, mind}
 }
 
+func (c *Character) GetMovement() pixel.Vec {
+	pose, isLeft := c.GetPose()
+	mov := pose.GetMovement()
+	flip := pixel.V(-1, 1)
+	if isLeft {
+		mov = mov.ScaledXY(flip)
+	}
+	return mov
+}
+
 func (c *Character) ChangePose(name string) {
 	if c.pose != "" && c.pose != name {
 		pose, _ := c.GetPose()

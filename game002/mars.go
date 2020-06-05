@@ -18,6 +18,7 @@ func NewMars(win *pixelgl.Window) *world.World {
 	}
 
 	hero := NewHero()
+	alien := NewAlien()
 
 	mapOne := maps.NewMap(&maps.MapOpts{
 		Sheet:     groundSheet,
@@ -46,8 +47,8 @@ func NewMars(win *pixelgl.Window) *world.World {
 			{8, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 10, 6, 6, 6, 6, 6, 5, 0},
 			{8, 0, 8, 0, 0, 0, 0, 10, 9, 0, 0, 4, 0, 11, 12, 0, 0, 0, 0, 4, 0},
 			{8, 0, 8, 0, 10, 6, 6, 6, 12, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 4, 0},
-			{8, 0, 8, 0, 8, 0, 0, 0, 0, 0, 0, 4, 0, 10, 9, 0, 0, 0, 0, 4, 0},
-			{8, 0, 8, 0, 8, 0, 0, 0, 0, 0, 0, 4, 0, 11, 2, 2, 2, 5, 0, 4, 0},
+			{8, 0, 8, 0, 8, 0, 0, 0, 0, 0, 0, 4, 10, 9, 0, 0, 0, 0, 0, 4, 0},
+			{8, 0, 8, 0, 8, 0, 0, 0, 0, 0, 0, 4, 11, 2, 2, 2, 2, 5, 0, 4, 0},
 			{8, 0, 8, 0, 11, 2, 2, 2, 2, 2, 2, 3, 0, 0, 0, 0, 0, 4, 0, 4, 0},
 			{8, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 9, 0, 0, 4, 0, 4, 0},
 			{8, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 4, 0, 0, 4, 0, 4, 0},
@@ -59,5 +60,5 @@ func NewMars(win *pixelgl.Window) *world.World {
 		Start: pixel.V(-90, -150),
 	})
 
-	return &world.World{[]*maps.Map{mapOne}, []*characters.Character{}, hero, win.Bounds().Center(), win}
+	return &world.World{[]*maps.Map{mapOne}, []*characters.Character{alien}, hero, win.Bounds().Center(), win}
 }
