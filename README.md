@@ -10,3 +10,7 @@ This repo holds code, notes and builds for a side project I am working on in the
 go get github.com/markbates/pkger/cmd/pkger
 go get github.com/machinebox/appify
 ```
+
+## Art
+
+Art in this repo is by [Torn](https://opengameart.org/users/torn), [Antifarea and CharlesGabriel](https://opengameart.org/content/18x20-characters-walkattackcast-spritesheet).
