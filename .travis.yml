@@ -45,3 +45,4 @@ deploy:
     repo: mcwhittemore/mars-game
     branch: travis
   skip_cleanup: 'true'
+  draft: true
