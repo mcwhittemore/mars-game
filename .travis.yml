@@ -1,0 +1,6 @@
+language: go
+script:
+  - ls
+  - go build main.go
+  - ls
+
