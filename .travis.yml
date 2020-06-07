@@ -2,7 +2,7 @@ os: windows
 language: go
 go: 1.14.x
 script:
-- go build -o mars-game-windows.exe main.go
+- go build -o mars-game-windows.exe main.go pkged.go
 - ls
 before_install:
 - rm Makefile
