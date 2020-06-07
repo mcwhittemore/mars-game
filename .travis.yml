@@ -1,11 +1,14 @@
 os: windows
 language: go
+go: 1.14.x
 
 script:
+- go version
 - go build main.go
 - ls
 
 before_install:
+- rm Makefile
 - |-
     case $TRAVIS_OS_NAME in
       windows)
