@@ -3,6 +3,7 @@ package main
 import (
 	"app/game001"
 	"app/game002"
+	"app/game003"
 	"app/world"
 
 	"os"
@@ -26,7 +27,7 @@ func run() {
 		panic(err)
 	}
 
-	id := "2"
+	id := "3"
 	var game *world.World
 	if len(os.Args) == 2 {
 		id = os.Args[1]
@@ -36,6 +37,8 @@ func run() {
 		game = game001.NewMars(win)
 	} else if id == "2" {
 		game = game002.NewMars(win)
+	} else if id == "3" {
+		game = game003.NewMars(win)
 	} else {
 		panic("Unexpected game trying to load: " + id)
 	}
