@@ -13,4 +13,4 @@ go get github.com/machinebox/appify
 
 ## Art
 
-Art in this repo is by [Torn](https://opengameart.org/users/torn), [Antifarea and CharlesGabriel](https://opengameart.org/content/18x20-characters-walkattackcast-spritesheet).
+Art in this repo is by [Torn](https://opengameart.org/users/torn), [Antifarea and CharlesGabriel](https://opengameart.org/content/18x20-characters-walkattackcast-spritesheet) and [josehzz](https://opengameart.org/content/farming-crops-16x16).
