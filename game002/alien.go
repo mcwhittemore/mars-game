@@ -24,7 +24,7 @@ func NewAlien() *characters.Character {
 
 	dir := 0 // 0 = down, 1 = right, 2 = up, 3 = left
 
-	rando := characters.NewCharacter(characterSheet, pixel.V(140, 140), func(c *characters.Character, dt float64, win characters.MindInput) {
+	rando := characters.NewCharacter(characterSheet, pixel.V(500, 500), func(c *characters.Character, dt float64, win characters.MindInput) {
 		hp := win.GetHeroPos()
 		dist := pixel.L(hp, c.Pos).Len()
 		dx := math.Abs(hp.X - c.Pos.X)

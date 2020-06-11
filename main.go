@@ -3,7 +3,7 @@ package main
 import (
 	"app/game"
 	"app/game001"
-	//	"app/game002"
+	"app/game002"
 	//	"app/game003"
 
 	"os"
@@ -30,7 +30,7 @@ func run() {
 	gs := game.NewGameState(win)
 
 	gs.AddScene("game-001", game001.NewMars)
-	//gs.AddScene("game-002", game002.NewMars)
+	gs.AddScene("game-002", game002.NewMars)
 	//gs.AddScene("game-003", game003.NewMars)
 
 	id := "1"
@@ -40,10 +40,10 @@ func run() {
 
 	if id == "1" {
 		gs.ChangeScene("game-001")
-		/*} else if id == "2" {
-			gs.ChangeScene("game-002", nil)
-		} else if id == "3" {
-			gs.ChangeScene("game-003", nil) */
+	} else if id == "2" {
+		gs.ChangeScene("game-002")
+		/*} else if id == "3" {
+		gs.ChangeScene("game-003", nil) */
 	} else {
 		panic("Unexpected game trying to load: " + id)
 	}

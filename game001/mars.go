@@ -10,9 +10,8 @@ import (
 )
 
 type Game001 struct {
-	ground     *maps.Map
-	characters []*characters.Character
-	cam        pixel.Vec
+	ground *maps.Map
+	cam    pixel.Vec
 }
 
 func (g *Game001) GetMap() *maps.Map {
@@ -29,7 +28,6 @@ func (g *Game001) SetCamera(cam pixel.Vec) {
 
 func (g *Game001) Enter(mi characters.MindInput) {
 	safe := pixel.R(188, 200, 388, 400)
-	g.characters = make([]*characters.Character, 0)
 
 	ctr := safe.Center()
 
