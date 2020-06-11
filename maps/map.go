@@ -15,18 +15,15 @@ type MapOpts struct {
 	Tiles     []*Tile
 	TileTypes []int
 	Grid      [][]int
-	Start     pixel.Vec
 }
 
 type Map struct {
 	Render    *pixel.Batch
 	tileDim   float64
 	gridTypes [][]int
-	offset    pixel.Vec
 }
 
 func (m *Map) IsObstacle(pos pixel.Vec) bool {
-	pos = pos.Sub(m.offset)
 	x := int(pos.X / m.tileDim)
 	y := int(pos.Y / m.tileDim)
 
@@ -66,7 +63,7 @@ func NewMap(opts *MapOpts) *Map {
 
 	nr := len(opts.Grid) - 1
 	for y, row := range opts.Grid {
-		place := opts.Start.Add(pixel.Vec{X: 0, Y: float64(nr-y) * dim})
+		place := pixel.ZV.Add(pixel.Vec{X: 0, Y: float64(nr-y) * dim})
 		rowTypes := make([]int, len(row))
 		gridTypes[y] = rowTypes
 		for x, tileId := range row {
@@ -80,7 +77,6 @@ func NewMap(opts *MapOpts) *Map {
 		Render:    batch,
 		tileDim:   dim,
 		gridTypes: gridTypes,
-		offset:    opts.Start,
 	}
 
 }

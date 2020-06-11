@@ -12,6 +12,9 @@ type MindInput interface {
 	KeepInView(pixel.Vec, pixel.Vec, float64)
 	IsObstacle(pixel.Vec) bool
 	GetHeroPos() pixel.Vec
+	AddCharacter(string, *CharacterData)
+	ShowCharacter(string, *Character)
+	RemoveCharacter(string)
 }
 
 type MindFunc func(*Character, float64, MindInput)

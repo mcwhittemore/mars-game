@@ -1,10 +1,10 @@
 package main
 
 import (
+	"app/game"
 	"app/game001"
-	"app/game002"
-	"app/game003"
-	"app/world"
+	//	"app/game002"
+	//	"app/game003"
 
 	"os"
 	"time"
@@ -27,18 +27,23 @@ func run() {
 		panic(err)
 	}
 
-	id := "3"
-	var game *world.World
+	gs := game.NewGameState(win)
+
+	gs.AddScene("game-001", game001.NewMars)
+	//gs.AddScene("game-002", game002.NewMars)
+	//gs.AddScene("game-003", game003.NewMars)
+
+	id := "1"
 	if len(os.Args) == 2 {
 		id = os.Args[1]
 	}
 
 	if id == "1" {
-		game = game001.NewMars(win)
-	} else if id == "2" {
-		game = game002.NewMars(win)
-	} else if id == "3" {
-		game = game003.NewMars(win)
+		gs.ChangeScene("game-001")
+		/*} else if id == "2" {
+			gs.ChangeScene("game-002", nil)
+		} else if id == "3" {
+			gs.ChangeScene("game-003", nil) */
 	} else {
 		panic("Unexpected game trying to load: " + id)
 	}
@@ -50,8 +55,8 @@ func run() {
 		last = time.Now()
 		win.Clear(colornames.Greenyellow)
 
-		game.Update(dt)
-		game.DrawHitBoxes()
+		gs.Update(dt)
+		gs.Render(win)
 
 		win.Update()
 	}

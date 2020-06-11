@@ -2,29 +2,70 @@ package game001
 
 import (
 	"app/characters"
+	"app/game"
 	"app/maps"
 	"app/sheet"
-	"app/world"
 
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/pixelgl"
 )
 
-func NewMars(win *pixelgl.Window) *world.World {
+type Game001 struct {
+	ground     *maps.Map
+	characters []*characters.Character
+	cam        pixel.Vec
+}
+
+func (g *Game001) GetMap() *maps.Map {
+	return g.ground
+}
+
+func (g *Game001) GetCamera() pixel.Vec {
+	return g.cam
+}
+
+func (g *Game001) SetCamera(cam pixel.Vec) {
+	g.cam = cam
+}
+
+func (g *Game001) Enter(mi characters.MindInput) {
+	safe := pixel.R(188, 200, 388, 400)
+	g.characters = make([]*characters.Character, 0)
+
+	ctr := safe.Center()
+
+	mi.AddCharacter("rando-1", nil)
+	mi.ShowCharacter("rando-1", NewRando(92, ctr))
+
+	mi.AddCharacter("rando-2", nil)
+	mi.ShowCharacter("rando-2", NewRando(89, ctr))
+
+	mi.AddCharacter("rando-3", nil)
+	mi.ShowCharacter("rando-3", NewRando(86, ctr))
+
+	mi.AddCharacter("rando-4", nil)
+	mi.ShowCharacter("rando-4", NewRando(83, ctr))
+
+	mi.AddCharacter("hero", nil)
+	mi.ShowCharacter("hero", NewHero())
+}
+
+func (g *Game001) Exit(mi characters.MindInput) {
+	mi.RemoveCharacter("rando-1")
+	mi.RemoveCharacter("rando-2")
+	mi.RemoveCharacter("rando-3")
+	mi.RemoveCharacter("rando-4")
+}
+
+func (g *Game001) Update(dt float64, mind characters.MindInput) {
+	// Have this follow hero
+}
+
+func NewMars() game.Scene {
 
 	groundSheet, err := sheet.NewSheet("crater.png", pixel.Vec{X: 20, Y: 20}, pixel.ZV, 64)
 	if err != nil {
 		panic(err)
 	}
-
-	safe := pixel.R(188, 200, 388, 400)
-	npcs := make([]*characters.Character, 0)
-	npcs = append(npcs, NewRando(92, safe.Center()))
-	npcs = append(npcs, NewRando(89, safe.Center()))
-	npcs = append(npcs, NewRando(86, safe.Center()))
-	npcs = append(npcs, NewRando(83, safe.Center()))
-
-	hero := NewHero()
 
 	mapOne := maps.NewMap(&maps.MapOpts{
 		Sheet:     groundSheet,
@@ -42,8 +83,10 @@ func NewMars(win *pixelgl.Window) *world.World {
 			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		},
-		Start: pixel.ZV,
 	})
 
-	return &world.World{[]*maps.Map{mapOne}, npcs, hero, win.Bounds().Center(), win}
+	return &Game001{
+		ground: mapOne,
+		cam:    pixel.V(300, 300),
+	}
 }

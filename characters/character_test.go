@@ -15,7 +15,7 @@ func TestPosBounds(t *testing.T) {
 	}
 
 	char := NewCharacter(cs, pixel.ZV, func(c *Character, dt float64, md MindInput) {})
-	char.AddPose("only", []pixel.Vec{{0, 0}}, pixel.ZV)
+	char.AddPose("only", []pixel.Vec{{X: 0, Y: 0}}, pixel.ZV)
 	char.ChangePose("only")
 
 	received := char.PosBounds(pixel.ZV)
@@ -34,7 +34,7 @@ func TestPosBoundsWithEqualSheetScaling(t *testing.T) {
 	}
 
 	char := NewCharacter(cs, pixel.ZV, func(c *Character, dt float64, md MindInput) {})
-	char.AddPose("only", []pixel.Vec{{0, 0}}, pixel.ZV)
+	char.AddPose("only", []pixel.Vec{{X: 0, Y: 0}}, pixel.ZV)
 	char.ChangePose("only")
 
 	received := char.PosBounds(pixel.ZV)
@@ -53,7 +53,7 @@ func TestPosBoundsWithSheetScaling(t *testing.T) {
 	}
 
 	char := NewCharacter(cs, pixel.ZV, func(c *Character, dt float64, md MindInput) {})
-	char.AddPose("only", []pixel.Vec{{0, 0}}, pixel.ZV)
+	char.AddPose("only", []pixel.Vec{{X: 0, Y: 0}}, pixel.ZV)
 	char.ChangePose("only")
 
 	received := char.PosBounds(pixel.ZV)

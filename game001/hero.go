@@ -11,7 +11,7 @@ import (
 )
 
 func NewHero() *characters.Character {
-	characterSheet, err := sheet.NewSheet("characters.png", pixel.Vec{18, 20}, pixel.Vec{0, 2}, 64)
+	characterSheet, err := sheet.NewSheet("characters.png", pixel.Vec{X: 18, Y: 20}, pixel.Vec{X: 0, Y: 2}, 64)
 	if err != nil {
 		panic(err)
 	}
@@ -66,9 +66,9 @@ func NewHero() *characters.Character {
 	offsetH = 2 / 18
 	offsetV = 2 / 20
 
-	hero.AddPose("down", []pixel.Vec{{1, 95}, {2, 95}, {3 + offsetH, 95 - offsetV}, {4 + offsetH, 95}, {0, 95}}, pixel.Vec{0, -200})
-	hero.AddPose("side", []pixel.Vec{{1, 96}, {2, 96}, {3 + offsetH, 96 - offsetV}, {4 + offsetH, 96}, {0, 96}}, pixel.Vec{200, 0})
-	hero.AddPose("up", []pixel.Vec{{1, 97}, {2, 97}, {3 + offsetH, 97 - offsetV}, {4 + offsetH, 97}, {0, 97}}, pixel.Vec{0, 200})
+	hero.AddPose("down", []pixel.Vec{{X: 1, Y: 95}, {X: 2, Y: 95}, {X: 3 + offsetH, Y: 95 - offsetV}, {X: 4 + offsetH, Y: 95}, {X: 0, Y: 95}}, pixel.Vec{X: 0, Y: -200})
+	hero.AddPose("side", []pixel.Vec{{X: 1, Y: 96}, {X: 2, Y: 96}, {X: 3 + offsetH, Y: 96 - offsetV}, {X: 4 + offsetH, Y: 96}, {X: 0, Y: 96}}, pixel.Vec{X: 200, Y: 0})
+	hero.AddPose("up", []pixel.Vec{{X: 1, Y: 97}, {X: 2, Y: 97}, {X: 3 + offsetH, Y: 97 - offsetV}, {X: 4 + offsetH, Y: 97}, {X: 0, Y: 97}}, pixel.Vec{X: 0, Y: 200})
 
 	hero.ChangePose("down")
 
