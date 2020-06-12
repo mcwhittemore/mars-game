@@ -1,46 +1,47 @@
-package game003
+package game
 
 import (
 	"app/characters"
-	"app/game"
 	"app/maps"
 	"app/sheet"
 
 	"github.com/faiface/pixel"
 )
 
-type Game003 struct {
+type PIL003 struct {
 	ground *maps.Map
 	cam    pixel.Vec
 }
 
-func (g *Game003) GetMap() *maps.Map {
+func (g *PIL003) GetMap() *maps.Map {
 	return g.ground
 }
 
-func (g *Game003) GetCamera() pixel.Vec {
+func (g *PIL003) GetCamera() pixel.Vec {
 	return g.cam
 }
 
-func (g *Game003) SetCamera(cam pixel.Vec) {
+func (g *PIL003) SetCamera(cam pixel.Vec) {
 	g.cam = cam
 }
 
-func (g *Game003) Enter(mi characters.MindInput) {
+func (g *PIL003) Enter(mi characters.MindInput) {
 	mi.AddCharacter("hero", nil)
-	mi.ShowCharacter("hero", NewHero())
+	hero := characters.NewHeroDefault()
+	hero.Pos = pixel.V(500, 600)
+	mi.ShowCharacter("hero", hero)
 }
 
-func (g *Game003) Exit(mi characters.MindInput) {
+func (g *PIL003) Exit(mi characters.MindInput) {
 	mi.RemoveCharacter("hero")
 }
 
-func (g *Game003) Update(dt float64, mind characters.MindInput) {
+func (g *PIL003) Update(dt float64, mind characters.MindInput) {
 	hp := mind.GetHeroPos()
 	mind.KeepInView(hp, 200)
 }
 
-func NewMars() game.Scene {
+func NewPIL003() Scene {
 
 	groundSheet, err := sheet.NewSheet("crater.png", pixel.Vec{X: 20, Y: 20}, pixel.ZV, 64)
 	if err != nil {
@@ -93,7 +94,7 @@ func NewMars() game.Scene {
 		},
 	})
 
-	return &Game003{
+	return &PIL003{
 		ground: mapOne,
 		cam:    pixel.V(600, 600),
 	}

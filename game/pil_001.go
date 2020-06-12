@@ -1,60 +1,61 @@
-package game001
+package game
 
 import (
 	"app/characters"
-	"app/game"
 	"app/maps"
 	"app/sheet"
 
 	"github.com/faiface/pixel"
 )
 
-type Game001 struct {
+type PIL001 struct {
 	ground *maps.Map
 	cam    pixel.Vec
 }
 
-func (g *Game001) GetMap() *maps.Map {
+func (g *PIL001) GetMap() *maps.Map {
 	return g.ground
 }
 
-func (g *Game001) GetCamera() pixel.Vec {
+func (g *PIL001) GetCamera() pixel.Vec {
 	return g.cam
 }
 
-func (g *Game001) SetCamera(cam pixel.Vec) {
+func (g *PIL001) SetCamera(cam pixel.Vec) {
 	g.cam = cam
 }
 
-func (g *Game001) Enter(mi characters.MindInput) {
+func (g *PIL001) Enter(mi characters.MindInput) {
 	safe := pixel.R(188, 200, 388, 400)
 
 	ctr := safe.Center()
 
 	mi.AddCharacter("rando-1", nil)
-	mi.ShowCharacter("rando-1", NewRando(92, ctr))
+	mi.ShowCharacter("rando-1", characters.NewRando(92, ctr))
 
 	mi.AddCharacter("rando-2", nil)
-	mi.ShowCharacter("rando-2", NewRando(89, ctr))
+	mi.ShowCharacter("rando-2", characters.NewRando(89, ctr))
 
 	mi.AddCharacter("rando-3", nil)
-	mi.ShowCharacter("rando-3", NewRando(86, ctr))
+	mi.ShowCharacter("rando-3", characters.NewRando(86, ctr))
 
 	mi.AddCharacter("rando-4", nil)
-	mi.ShowCharacter("rando-4", NewRando(83, ctr))
+	mi.ShowCharacter("rando-4", characters.NewRando(83, ctr))
 
 	mi.AddCharacter("hero", nil)
-	mi.ShowCharacter("hero", NewHero())
+	hero := characters.NewHeroDefault()
+	hero.Pos = ctr
+	mi.ShowCharacter("hero", hero)
 }
 
-func (g *Game001) Exit(mi characters.MindInput) {
+func (g *PIL001) Exit(mi characters.MindInput) {
 	mi.RemoveCharacter("rando-1")
 	mi.RemoveCharacter("rando-2")
 	mi.RemoveCharacter("rando-3")
 	mi.RemoveCharacter("rando-4")
 }
 
-func (g *Game001) Update(dt float64, mi characters.MindInput) {
+func (g *PIL001) Update(dt float64, mi characters.MindInput) {
 	safe := pixel.R(188, 200, 388, 400)
 	hero := mi.GetCharacter("hero").Character
 	isSafe := hero.Hits(safe)
@@ -71,7 +72,7 @@ func (g *Game001) Update(dt float64, mi characters.MindInput) {
 	}
 }
 
-func NewMars() game.Scene {
+func NewPIL001() Scene {
 
 	groundSheet, err := sheet.NewSheet("crater.png", pixel.Vec{X: 20, Y: 20}, pixel.ZV, 64)
 	if err != nil {
@@ -96,7 +97,7 @@ func NewMars() game.Scene {
 		},
 	})
 
-	return &Game001{
+	return &PIL001{
 		ground: mapOne,
 		cam:    pixel.V(300, 300),
 	}

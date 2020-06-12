@@ -1,50 +1,53 @@
-package game002
+package game
 
 import (
 	"app/characters"
-	"app/game"
 	"app/maps"
 	"app/sheet"
 
 	"github.com/faiface/pixel"
 )
 
-type Game002 struct {
+type PIL002 struct {
 	ground *maps.Map
 	cam    pixel.Vec
 }
 
-func (g *Game002) GetMap() *maps.Map {
+func (g *PIL002) GetMap() *maps.Map {
 	return g.ground
 }
 
-func (g *Game002) GetCamera() pixel.Vec {
+func (g *PIL002) GetCamera() pixel.Vec {
 	return g.cam
 }
 
-func (g *Game002) SetCamera(cam pixel.Vec) {
+func (g *PIL002) SetCamera(cam pixel.Vec) {
 	g.cam = cam
 }
 
-func (g *Game002) Enter(mi characters.MindInput) {
+func (g *PIL002) Enter(mi characters.MindInput) {
 	mi.AddCharacter("alien", nil)
-	mi.ShowCharacter("alien", NewAlien())
+	alien := characters.NewAlien()
+	alien.Pos = pixel.V(500, 500)
+	mi.ShowCharacter("alien", alien)
 
 	mi.AddCharacter("hero", nil)
-	mi.ShowCharacter("hero", NewHero())
+	hero := characters.NewHeroDefault()
+	hero.Pos = pixel.V(500, 600)
+	mi.ShowCharacter("hero", hero)
 }
 
-func (g *Game002) Exit(mi characters.MindInput) {
+func (g *PIL002) Exit(mi characters.MindInput) {
 	mi.RemoveCharacter("alien")
 	mi.RemoveCharacter("hero")
 }
 
-func (g *Game002) Update(dt float64, mind characters.MindInput) {
+func (g *PIL002) Update(dt float64, mind characters.MindInput) {
 	hp := mind.GetHeroPos()
 	mind.KeepInView(hp, 200)
 }
 
-func NewMars() game.Scene {
+func NewPIL002() Scene {
 
 	groundSheet, err := sheet.NewSheet("crater.png", pixel.Vec{X: 20, Y: 20}, pixel.ZV, 64)
 	if err != nil {
@@ -94,7 +97,7 @@ func NewMars() game.Scene {
 		},
 	})
 
-	return &Game002{
+	return &PIL002{
 		ground: mapOne,
 		cam:    pixel.V(600, 600),
 	}

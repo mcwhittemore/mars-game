@@ -1,7 +1,6 @@
-package game002
+package characters
 
 import (
-	"app/characters"
 	"app/sheet"
 
 	"math"
@@ -10,7 +9,7 @@ import (
 	"github.com/faiface/pixel"
 )
 
-func NewAlien() *characters.Character {
+func NewAlien() *Character {
 	startRow := float64(23)
 
 	characterSheet, err := sheet.NewSheet("characters.png", pixel.Vec{18, 20}, pixel.Vec{0, 2}, 64)
@@ -24,7 +23,7 @@ func NewAlien() *characters.Character {
 
 	dir := 0 // 0 = down, 1 = right, 2 = up, 3 = left
 
-	rando := characters.NewCharacter(characterSheet, pixel.V(500, 500), func(c *characters.Character, dt float64, win characters.MindInput) {
+	rando := NewCharacter(characterSheet, func(c *Character, dt float64, win MindInput) {
 		hp := win.GetHeroPos()
 		dist := pixel.L(hp, c.Pos).Len()
 		dx := math.Abs(hp.X - c.Pos.X)

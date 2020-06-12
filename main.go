@@ -2,9 +2,6 @@ package main
 
 import (
 	"app/game"
-	"app/game001"
-	"app/game002"
-	"app/game003"
 
 	"os"
 	"time"
@@ -29,9 +26,9 @@ func run() {
 
 	gs := game.NewGameState(win)
 
-	gs.AddScene("game-001", game001.NewMars)
-	gs.AddScene("game-002", game002.NewMars)
-	gs.AddScene("game-003", game003.NewMars)
+	gs.AddScene("game-001", game.NewPIL001)
+	gs.AddScene("game-002", game.NewPIL002)
+	gs.AddScene("game-003", game.NewPIL003)
 
 	id := "3"
 	if len(os.Args) == 2 {

@@ -15,9 +15,15 @@ type Character struct {
 	mind  MindFunc
 }
 
-func NewCharacter(sheet *sheet.Sheet, pos pixel.Vec, mind MindFunc) *Character {
+func NewCharacter(sheet *sheet.Sheet, mind MindFunc) *Character {
 	poses := make(map[string]*Pose)
-	return &Character{pos, "", sheet, poses, mind}
+	return &Character{
+		Pos:   pixel.ZV,
+		pose:  "",
+		sheet: sheet,
+		poses: poses,
+		mind:  mind,
+	}
 }
 
 func (c *Character) GetMovement() pixel.Vec {

@@ -1,7 +1,6 @@
-package game002
+package characters
 
 import (
-	"app/characters"
 	"app/sheet"
 
 	"time"
@@ -10,14 +9,14 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-func NewHero() *characters.Character {
+func NewHeroDefault() *Character {
 	characterSheet, err := sheet.NewSheet("characters.png", pixel.Vec{X: 18, Y: 20}, pixel.Vec{X: 0, Y: 2}, 64)
 	if err != nil {
 		panic(err)
 	}
 
 	second := time.Tick(200 * time.Millisecond)
-	hero := characters.NewCharacter(characterSheet, pixel.V(500, 600), func(c *characters.Character, dt float64, win characters.MindInput) {
+	hero := NewCharacter(characterSheet, func(c *Character, dt float64, win MindInput) {
 		if win.JustPressed(pixelgl.KeyD) {
 			c.ChangePose("side")
 		} else if win.JustPressed(pixelgl.KeyA) {
