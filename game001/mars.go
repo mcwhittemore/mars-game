@@ -54,7 +54,21 @@ func (g *Game001) Exit(mi characters.MindInput) {
 	mi.RemoveCharacter("rando-4")
 }
 
-func (g *Game001) Update(dt float64, mind characters.MindInput) {
+func (g *Game001) Update(dt float64, mi characters.MindInput) {
+	safe := pixel.R(188, 200, 388, 400)
+	hero := mi.GetCharacter("hero").Character
+	isSafe := hero.Hits(safe)
+	if isSafe {
+		return
+	}
+
+	selfbox := hero.PosBounds(hero.Pos)
+	_, subject := mi.GetCollideRect(selfbox, interface{}(hero))
+
+	for subject != nil {
+		subject.DropNear(safe.Center(), mi.GetCollideRect)
+		_, subject = mi.GetCollideRect(selfbox, interface{}(hero))
+	}
 }
 
 func NewMars() game.Scene {

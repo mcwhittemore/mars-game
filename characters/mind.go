@@ -15,6 +15,7 @@ type MindInput interface {
 	AddCharacter(string, *CharacterData)
 	ShowCharacter(string, *Character)
 	RemoveCharacter(string)
+	GetCharacter(string) *CharacterData
 }
 
 type MindFunc func(*Character, float64, MindInput)

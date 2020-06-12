@@ -47,19 +47,6 @@ func NewHero() *characters.Character {
 		}
 
 		c.Pos = c.Pos.Add(mov.Scaled(dt))
-
-		isSafe := c.Hits(safe)
-		if isSafe {
-			return
-		}
-
-		selfbox := c.PosBounds(c.Pos)
-		_, subject := win.GetCollideRect(selfbox, interface{}(c))
-
-		for subject != nil {
-			subject.DropNear(safe.Center(), win.GetCollideRect)
-			_, subject = win.GetCollideRect(selfbox, interface{}(c))
-		}
 	})
 
 	var offsetH, offsetV float64

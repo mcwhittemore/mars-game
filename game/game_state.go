@@ -87,6 +87,10 @@ func (gs *GameState) RemoveCharacter(name string) {
 	gs.characters[name] = nil
 }
 
+func (gs *GameState) GetCharacter(name string) *characters.CharacterData {
+	return gs.characters[name]
+}
+
 func (gs *GameState) AddScene(name string, sb SceneBuilder) {
 	gs.sceneManager.AddScene(name, sb)
 }
