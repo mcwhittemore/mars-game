@@ -1,24 +1,58 @@
-package game002
+package game
 
 import (
 	"app/characters"
 	"app/maps"
 	"app/sheet"
-	"app/world"
 
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/pixelgl"
 )
 
-func NewMars(win *pixelgl.Window) *world.World {
+type PIL002 struct {
+	ground *maps.Map
+	cam    pixel.Vec
+}
+
+func (g *PIL002) GetMap() *maps.Map {
+	return g.ground
+}
+
+func (g *PIL002) GetCamera() pixel.Vec {
+	return g.cam
+}
+
+func (g *PIL002) SetCamera(cam pixel.Vec) {
+	g.cam = cam
+}
+
+func (g *PIL002) Enter(mi characters.MindInput) {
+	mi.AddCharacter("alien", nil)
+	alien := characters.NewAlien()
+	alien.Pos = pixel.V(500, 500)
+	mi.ShowCharacter("alien", alien)
+
+	mi.AddCharacter("hero", nil)
+	hero := characters.NewHeroDefault()
+	hero.Pos = pixel.V(500, 600)
+	mi.ShowCharacter("hero", hero)
+}
+
+func (g *PIL002) Exit(mi characters.MindInput) {
+	mi.RemoveCharacter("alien")
+	mi.RemoveCharacter("hero")
+}
+
+func (g *PIL002) Update(dt float64, mind characters.MindInput) {
+	hp := mind.GetHeroPos()
+	mind.KeepInView(hp, 200)
+}
+
+func NewPIL002() Scene {
 
 	groundSheet, err := sheet.NewSheet("crater.png", pixel.Vec{X: 20, Y: 20}, pixel.ZV, 64)
 	if err != nil {
 		panic(err)
 	}
-
-	hero := NewHero()
-	alien := NewAlien()
 
 	mapOne := maps.NewMap(&maps.MapOpts{
 		Sheet:     groundSheet,
@@ -61,8 +95,11 @@ func NewMars(win *pixelgl.Window) *world.World {
 			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		},
-		Start: pixel.V(-270, -310),
 	})
 
-	return &world.World{[]*maps.Map{mapOne}, []*characters.Character{alien}, hero, win.Bounds().Center(), win}
+	return &PIL002{
+		ground: mapOne,
+		cam:    pixel.V(600, 600),
+	}
+
 }

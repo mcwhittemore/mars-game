@@ -4,6 +4,7 @@ import (
 	"app/sheet"
 
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/pixelgl"
 )
 
 type Character struct {
@@ -14,9 +15,15 @@ type Character struct {
 	mind  MindFunc
 }
 
-func NewCharacter(sheet *sheet.Sheet, pos pixel.Vec, mind MindFunc) *Character {
+func NewCharacter(sheet *sheet.Sheet, mind MindFunc) *Character {
 	poses := make(map[string]*Pose)
-	return &Character{pos, "", sheet, poses, mind}
+	return &Character{
+		Pos:   pixel.ZV,
+		pose:  "",
+		sheet: sheet,
+		poses: poses,
+		mind:  mind,
+	}
 }
 
 func (c *Character) GetMovement() pixel.Vec {
@@ -94,9 +101,7 @@ func (c *Character) GetNextPos(dt float64) pixel.Vec {
 	return c.Pos.Add(mov.Scaled(dt))
 }
 
-func (c *Character) Update(dt float64, win MindInput) (*pixel.Sprite, pixel.Matrix) {
-	c.mind(c, dt, win)
-
+func (c *Character) Render(win *pixelgl.Window) {
 	pose, isLeft := c.GetPose()
 	sprite := pose.GetSprite()
 
@@ -108,7 +113,11 @@ func (c *Character) Update(dt float64, win MindInput) (*pixel.Sprite, pixel.Matr
 		matrix = matrix.Chained(faceLeft)
 	}
 
-	return sprite, matrix.Moved(c.Pos)
+	sprite.Draw(win, matrix.Moved(c.Pos))
+}
+
+func (c *Character) Update(dt float64, mi MindInput) {
+	c.mind(c, dt, mi)
 }
 
 func (c *Character) Step() {

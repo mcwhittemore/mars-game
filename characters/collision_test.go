@@ -14,12 +14,12 @@ func TestAdjustPosOnCollide(t *testing.T) {
 
 	getBounds := func(min pixel.Vec) pixel.Rect {
 		max := min.Add(pixel.V(32, 32))
-		return pixel.Rect{min, max}
+		return pixel.Rect{Min: min, Max: max}
 	}
 
-	findCollision := func(bds pixel.Rect, target interface{}) pixel.Rect {
+	findCollision := func(bds pixel.Rect, target interface{}) (pixel.Rect, *Character) {
 		couldHit := pixel.R(41, 41, 50, 50)
-		return couldHit.Intersect(bds)
+		return couldHit.Intersect(bds), nil
 	}
 
 	nextPos, hadHit := adjustPosForCollison(target, nextPos, startPos, getBounds, findCollision)
