@@ -11,7 +11,7 @@ import (
 )
 
 func NewHero() *characters.Character {
-	characterSheet, err := sheet.NewSheet("characters.png", pixel.Vec{18, 20}, pixel.Vec{0, 2}, 64)
+	characterSheet, err := sheet.NewSheet("characters.png", pixel.Vec{X: 18, Y: 20}, pixel.Vec{X: 0, Y: 2}, 64)
 	if err != nil {
 		panic(err)
 	}
@@ -50,9 +50,6 @@ func NewHero() *characters.Character {
 		if win.IsObstacle(nextPos) == false {
 			c.Pos = nextPos
 		}
-
-		win.KeepInView(c.Pos, mov.Scaled(dt), 200)
-
 	})
 
 	var offsetH, offsetV float64

@@ -9,7 +9,7 @@ type MindInput interface {
 	JustPressed(pixelgl.Button) bool
 	Pressed(pixelgl.Button) bool
 	GetCollideRect(pixel.Rect, interface{}) (pixel.Rect, *Character)
-	KeepInView(pixel.Vec, pixel.Vec, float64)
+	KeepInView(pixel.Vec, float64)
 	IsObstacle(pixel.Vec) bool
 	GetHeroPos() pixel.Vec
 	AddCharacter(string, *CharacterData)

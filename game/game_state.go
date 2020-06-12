@@ -143,7 +143,7 @@ func (gs *GameState) Pressed(button pixelgl.Button) bool {
 	return gs.win.Pressed(button)
 }
 
-func (gs *GameState) KeepInView(pos, mov pixel.Vec, buffer float64) {
+func (gs *GameState) KeepInView(pos pixel.Vec, buffer float64) {
 	bds := gs.win.Bounds()
 	campos := gs.sceneManager.Current.GetCamera()
 	cam := pixel.IM.Moved(gs.win.Bounds().Center().Sub(campos))
@@ -153,11 +153,14 @@ func (gs *GameState) KeepInView(pos, mov pixel.Vec, buffer float64) {
 		Max: cam.Unproject(bds.Max),
 	}
 
+	edgeDir := [4]pixel.Vec{{X: -1, Y: 0}, {X: 0, Y: 1}, {X: 1, Y: 0}, {X: 0, Y: -1}}
+
 	viewbox := viewBox.Edges()
-	for _, edge := range viewbox {
+	for i, edge := range viewbox {
 		closest := edge.Closest(pos)
 		dis := pixel.L(pos, closest).Len()
 		if dis < buffer {
+			mov := edgeDir[i].Scaled(buffer - dis)
 			campos = campos.Add(mov)
 			gs.sceneManager.Current.SetCamera(campos)
 			break

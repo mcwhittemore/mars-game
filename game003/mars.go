@@ -36,7 +36,8 @@ func (g *Game003) Exit(mi characters.MindInput) {
 }
 
 func (g *Game003) Update(dt float64, mind characters.MindInput) {
-	// Have this follow hero
+	hp := mind.GetHeroPos()
+	mind.KeepInView(hp, 200)
 }
 
 func NewMars() game.Scene {

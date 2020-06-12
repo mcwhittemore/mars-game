@@ -55,7 +55,6 @@ func (g *Game001) Exit(mi characters.MindInput) {
 }
 
 func (g *Game001) Update(dt float64, mind characters.MindInput) {
-	// Have this follow hero
 }
 
 func NewMars() game.Scene {
