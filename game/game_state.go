@@ -11,6 +11,7 @@ import (
 
 type GameState struct {
 	characters   map[string]*characters.CharacterData
+	items        map[int][]pixel.Vec
 	sceneManager *SceneManager
 	gameTime     float64
 	win          *pixelgl.Window

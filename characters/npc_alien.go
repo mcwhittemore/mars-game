@@ -94,9 +94,9 @@ func NewAlien(pos pixel.Vec) *Character {
 	offsetH = 2 / 18
 	offsetV = 2 / 20
 
-	alien.AddPose("down", []pixel.Vec{{1, startRow}, {2, startRow}, {3 + offsetH, startRow - offsetV}, {4 + offsetH, startRow}, {0, startRow}}, pixel.Vec{0, -200})
-	alien.AddPose("side", []pixel.Vec{{1, startRow + 1}, {2, startRow + 1}, {3 + offsetH, startRow + 1 - offsetV}, {4 + offsetH, startRow + 1}, {0, startRow + 1}}, pixel.Vec{200, 0})
-	alien.AddPose("up", []pixel.Vec{{1, startRow + 2}, {2, startRow + 2}, {3 + offsetH, startRow + 2 - offsetV}, {4 + offsetH, startRow + 2}, {0, startRow + 2}}, pixel.Vec{0, 200})
+	alien.AddPose("down", []pixel.Vec{{X: 1, Y: startRow}, {X: 2, Y: startRow}, {X: 3 + offsetH, Y: startRow - offsetV}, {X: 4 + offsetH, Y: startRow}, {X: 0, Y: startRow}}, pixel.Vec{X: 0, Y: -200})
+	alien.AddPose("side", []pixel.Vec{{X: 1, Y: startRow + 1}, {X: 2, Y: startRow + 1}, {X: 3 + offsetH, Y: startRow + 1 - offsetV}, {X: 4 + offsetH, Y: startRow + 1}, {X: 0, Y: startRow + 1}}, pixel.Vec{X: 200, Y: 0})
+	alien.AddPose("up", []pixel.Vec{{X: 1, Y: startRow + 2}, {X: 2, Y: startRow + 2}, {X: 3 + offsetH, Y: startRow + 2 - offsetV}, {X: 4 + offsetH, Y: startRow + 2}, {X: 0, Y: startRow + 2}}, pixel.Vec{X: 0, Y: 200})
 
 	alien.ChangePose("down")
 	alien.Pos = pos

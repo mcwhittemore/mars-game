@@ -14,7 +14,7 @@ func TestPosBounds(t *testing.T) {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 
-	char := NewCharacter(cs, pixel.ZV, func(c *Character, dt float64, md MindInput) {})
+	char := NewCharacter(cs, func(c *Character, dt float64, md MindInput) {})
 	char.AddPose("only", []pixel.Vec{{X: 0, Y: 0}}, pixel.ZV)
 	char.ChangePose("only")
 
@@ -33,7 +33,7 @@ func TestPosBoundsWithEqualSheetScaling(t *testing.T) {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 
-	char := NewCharacter(cs, pixel.ZV, func(c *Character, dt float64, md MindInput) {})
+	char := NewCharacter(cs, func(c *Character, dt float64, md MindInput) {})
 	char.AddPose("only", []pixel.Vec{{X: 0, Y: 0}}, pixel.ZV)
 	char.ChangePose("only")
 
@@ -52,7 +52,7 @@ func TestPosBoundsWithSheetScaling(t *testing.T) {
 		t.Fatalf("Unexpected error: %v", err)
 	}
 
-	char := NewCharacter(cs, pixel.ZV, func(c *Character, dt float64, md MindInput) {})
+	char := NewCharacter(cs, func(c *Character, dt float64, md MindInput) {})
 	char.AddPose("only", []pixel.Vec{{X: 0, Y: 0}}, pixel.ZV)
 	char.ChangePose("only")
 
