@@ -43,9 +43,7 @@ func (g *PIL001) Enter(mi characters.MindInput) {
 	mi.ShowCharacter("rando-4", characters.NewRando(83, ctr))
 
 	mi.AddCharacter("hero", nil)
-	hero := characters.NewHeroDefault()
-	hero.Pos = ctr
-	mi.ShowCharacter("hero", hero)
+	mi.ShowCharacter("hero", characters.NewHeroDefault(ctr))
 }
 
 func (g *PIL001) Exit(mi characters.MindInput) {

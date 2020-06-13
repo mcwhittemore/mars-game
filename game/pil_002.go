@@ -27,14 +27,10 @@ func (g *PIL002) SetCamera(cam pixel.Vec) {
 
 func (g *PIL002) Enter(mi characters.MindInput) {
 	mi.AddCharacter("alien", nil)
-	alien := characters.NewAlien()
-	alien.Pos = pixel.V(500, 500)
-	mi.ShowCharacter("alien", alien)
+	mi.ShowCharacter("alien", characters.NewAlien(pixel.V(500, 500)))
 
 	mi.AddCharacter("hero", nil)
-	hero := characters.NewHeroDefault()
-	hero.Pos = pixel.V(500, 600)
-	mi.ShowCharacter("hero", hero)
+	mi.ShowCharacter("hero", characters.NewHeroDefault(pixel.V(500, 600)))
 }
 
 func (g *PIL002) Exit(mi characters.MindInput) {

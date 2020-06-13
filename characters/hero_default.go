@@ -9,7 +9,7 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-func NewHeroDefault() *Character {
+func NewHeroDefault(pos pixel.Vec) *Character {
 	characterSheet, err := sheet.NewSheet("characters.png", pixel.Vec{X: 18, Y: 20}, pixel.Vec{X: 0, Y: 2}, 64)
 	if err != nil {
 		panic(err)
@@ -60,6 +60,7 @@ func NewHeroDefault() *Character {
 	hero.AddPose("up", []pixel.Vec{{1, 97}, {2, 97}, {3 + offsetH, 97 - offsetV}, {4 + offsetH, 97}, {0, 97}}, pixel.Vec{0, 200})
 
 	hero.ChangePose("down")
+	hero.Pos = pos
 
 	return hero
 }

@@ -9,10 +9,10 @@ import (
 	"github.com/faiface/pixel"
 )
 
-func NewAlien() *Character {
+func NewAlien(pos pixel.Vec) *Character {
 	startRow := float64(23)
 
-	characterSheet, err := sheet.NewSheet("characters.png", pixel.Vec{18, 20}, pixel.Vec{0, 2}, 64)
+	characterSheet, err := sheet.NewSheet("characters.png", pixel.Vec{X: 18, Y: 20}, pixel.Vec{X: 0, Y: 2}, 64)
 	if err != nil {
 		panic(err)
 	}
@@ -23,7 +23,7 @@ func NewAlien() *Character {
 
 	dir := 0 // 0 = down, 1 = right, 2 = up, 3 = left
 
-	rando := NewCharacter(characterSheet, func(c *Character, dt float64, win MindInput) {
+	alien := NewCharacter(characterSheet, func(c *Character, dt float64, win MindInput) {
 		hp := win.GetHeroPos()
 		dist := pixel.L(hp, c.Pos).Len()
 		dx := math.Abs(hp.X - c.Pos.X)
@@ -94,11 +94,12 @@ func NewAlien() *Character {
 	offsetH = 2 / 18
 	offsetV = 2 / 20
 
-	rando.AddPose("down", []pixel.Vec{{1, startRow}, {2, startRow}, {3 + offsetH, startRow - offsetV}, {4 + offsetH, startRow}, {0, startRow}}, pixel.Vec{0, -200})
-	rando.AddPose("side", []pixel.Vec{{1, startRow + 1}, {2, startRow + 1}, {3 + offsetH, startRow + 1 - offsetV}, {4 + offsetH, startRow + 1}, {0, startRow + 1}}, pixel.Vec{200, 0})
-	rando.AddPose("up", []pixel.Vec{{1, startRow + 2}, {2, startRow + 2}, {3 + offsetH, startRow + 2 - offsetV}, {4 + offsetH, startRow + 2}, {0, startRow + 2}}, pixel.Vec{0, 200})
+	alien.AddPose("down", []pixel.Vec{{1, startRow}, {2, startRow}, {3 + offsetH, startRow - offsetV}, {4 + offsetH, startRow}, {0, startRow}}, pixel.Vec{0, -200})
+	alien.AddPose("side", []pixel.Vec{{1, startRow + 1}, {2, startRow + 1}, {3 + offsetH, startRow + 1 - offsetV}, {4 + offsetH, startRow + 1}, {0, startRow + 1}}, pixel.Vec{200, 0})
+	alien.AddPose("up", []pixel.Vec{{1, startRow + 2}, {2, startRow + 2}, {3 + offsetH, startRow + 2 - offsetV}, {4 + offsetH, startRow + 2}, {0, startRow + 2}}, pixel.Vec{0, 200})
 
-	rando.ChangePose("down")
+	alien.ChangePose("down")
+	alien.Pos = pos
 
-	return rando
+	return alien
 }
