@@ -15,6 +15,7 @@ type MindInput interface {
 	AddCharacter(string, *CharacterData)
 	ShowCharacter(string, *Character)
 	RemoveCharacter(string)
+	HideCharacter(string)
 	GetCharacter(string) *CharacterData
 }
 

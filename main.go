@@ -30,6 +30,8 @@ func run() {
 	gs.AddScene("game-002", game.NewPIL002)
 	gs.AddScene("game-003", game.NewPIL003)
 
+	gs.AddCharacter("hero", nil)
+
 	id := "3"
 	if len(os.Args) == 2 {
 		id = os.Args[1]

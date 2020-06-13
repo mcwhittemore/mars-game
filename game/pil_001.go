@@ -42,7 +42,6 @@ func (g *PIL001) Enter(mi characters.MindInput) {
 	mi.AddCharacter("rando-4", nil)
 	mi.ShowCharacter("rando-4", characters.NewRando(83, ctr))
 
-	mi.AddCharacter("hero", nil)
 	mi.ShowCharacter("hero", characters.NewHeroDefault(ctr))
 }
 
@@ -51,6 +50,7 @@ func (g *PIL001) Exit(mi characters.MindInput) {
 	mi.RemoveCharacter("rando-2")
 	mi.RemoveCharacter("rando-3")
 	mi.RemoveCharacter("rando-4")
+	mi.HideCharacter("rando-4")
 }
 
 func (g *PIL001) Update(dt float64, mi characters.MindInput) {

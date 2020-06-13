@@ -29,13 +29,12 @@ func (g *PIL002) Enter(mi characters.MindInput) {
 	mi.AddCharacter("alien", nil)
 	mi.ShowCharacter("alien", characters.NewAlien(pixel.V(500, 500)))
 
-	mi.AddCharacter("hero", nil)
 	mi.ShowCharacter("hero", characters.NewHeroDefault(pixel.V(500, 600)))
 }
 
 func (g *PIL002) Exit(mi characters.MindInput) {
 	mi.RemoveCharacter("alien")
-	mi.RemoveCharacter("hero")
+	mi.HideCharacter("hero")
 }
 
 func (g *PIL002) Update(dt float64, mind characters.MindInput) {
