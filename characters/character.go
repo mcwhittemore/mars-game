@@ -3,6 +3,8 @@ package characters
 import (
 	"app/sheet"
 
+	//	"math"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 )
@@ -76,6 +78,20 @@ func (c *Character) GetPose() (*Pose, bool) {
 	return pose, false
 }
 
+func (c *Character) GetDirection() pixel.Vec {
+	pose, isLeft := c.GetPose()
+	mov := pose.GetMovement()
+	flip := pixel.V(-1, 1)
+	if isLeft {
+		mov = mov.ScaledXY(flip)
+	}
+
+	//mov.X = mov.X / math.Abs(mov.X)
+	//mov.Y = mov.Y / math.Abs(mov.Y)
+
+	return mov
+}
+
 func (c *Character) PosBounds(pos pixel.Vec) pixel.Rect {
 	im := c.sheet.IM()
 	pose, _ := c.GetPose()
@@ -124,10 +140,6 @@ func (c *Character) Render(win *pixelgl.Window) {
 	}
 
 	sprite.Draw(win, matrix.Moved(c.Pos))
-}
-
-func (c *Character) Update(dt float64, mi MindInput) {
-	c.mind(c, dt, mi)
 }
 
 func (c *Character) Step() {

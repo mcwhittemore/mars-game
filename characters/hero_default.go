@@ -1,6 +1,7 @@
 package characters
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/faiface/pixel"
@@ -10,18 +11,28 @@ import (
 func NewHeroDefault(pos pixel.Vec) *Character {
 
 	second := time.Tick(200 * time.Millisecond)
-	hero := NewCharacter(characterSheet, func(c *Character, dt float64, win MindInput) {
-		if win.JustPressed(pixelgl.KeyD) {
+	hero := NewCharacter(characterSheet, func(cd *CharacterData, dt float64, mi MindInput) {
+		c := cd.Character
+		if mi.JustPressed(pixelgl.KeyD) {
 			c.ChangePose("side")
-		} else if win.JustPressed(pixelgl.KeyA) {
+		} else if mi.JustPressed(pixelgl.KeyA) {
 			c.ChangePose("left-side")
-		} else if win.JustPressed(pixelgl.KeyS) {
+		} else if mi.JustPressed(pixelgl.KeyS) {
 			c.ChangePose("down")
-		} else if win.JustPressed(pixelgl.KeyW) {
+		} else if mi.JustPressed(pixelgl.KeyW) {
 			c.ChangePose("up")
+		} else if mi.JustPressed(pixelgl.KeyJ) {
+			dir := c.GetDirection()
+			tp := c.Pos.Add(dir.Scaled(64))
+			fmt.Println(dir, tp)
+			item := mi.GetItem(tp)
+			if item != nil && item.CanPickUp() {
+				mi.RemoveItem(item)
+				cd.AddItem(item.Name)
+			}
 		}
 
-		if win.Pressed(pixelgl.KeyD) || win.Pressed(pixelgl.KeyA) || win.Pressed(pixelgl.KeyS) || win.Pressed(pixelgl.KeyW) {
+		if mi.Pressed(pixelgl.KeyD) || mi.Pressed(pixelgl.KeyA) || mi.Pressed(pixelgl.KeyS) || mi.Pressed(pixelgl.KeyW) {
 			select {
 			case <-second:
 				c.Step()
@@ -40,7 +51,7 @@ func NewHeroDefault(pos pixel.Vec) *Character {
 
 		nextPos := c.Pos.Add(mov.Scaled(dt))
 
-		if win.IsObstacle(nextPos) == false {
+		if mi.IsObstacle(nextPos) == false {
 			c.Pos = nextPos
 		}
 	})

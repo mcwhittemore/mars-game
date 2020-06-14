@@ -1,6 +1,8 @@
 package characters
 
 import (
+	"app/items"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 )
@@ -17,6 +19,9 @@ type MindInput interface {
 	RemoveCharacter(string)
 	HideCharacter(string)
 	GetCharacter(string) *CharacterData
+	AddItem(*items.Item)
+	GetItem(pixel.Vec) *items.Item
+	RemoveItem(*items.Item)
 }
 
-type MindFunc func(*Character, float64, MindInput)
+type MindFunc func(*CharacterData, float64, MindInput)

@@ -16,7 +16,8 @@ func NewAlien(pos pixel.Vec) *Character {
 
 	dir := 0 // 0 = down, 1 = right, 2 = up, 3 = left
 
-	alien := NewCharacter(characterSheet, func(c *Character, dt float64, win MindInput) {
+	alien := NewCharacter(characterSheet, func(cd *CharacterData, dt float64, win MindInput) {
+		c := cd.Character
 		hp := win.GetHeroPos()
 		dist := pixel.L(hp, c.Pos).Len()
 		dx := math.Abs(hp.X - c.Pos.X)

@@ -2,6 +2,7 @@ package game
 
 import (
 	"app/characters"
+	"app/items"
 
 	"fmt"
 
@@ -11,7 +12,7 @@ import (
 
 type GameState struct {
 	characters   map[string]*characters.CharacterData
-	items        map[int][]pixel.Vec
+	items        []*items.Item
 	sceneManager *SceneManager
 	gameTime     float64
 	win          *pixelgl.Window
@@ -34,10 +35,14 @@ func NewGameState(win *pixelgl.Window) *GameState {
 
 func (gs *GameState) Update(dt float64) {
 	for _, cd := range gs.characters {
-		if cd.Character == nil {
+		cd.Update(dt, gs)
+	}
+
+	for _, item := range gs.items {
+		if item.Mind == nil {
 			continue
 		}
-		cd.Character.Update(dt, gs)
+		item.Mind(item, dt, gs)
 	}
 
 	gs.sceneManager.Current.Update(dt, gs)
@@ -51,18 +56,53 @@ func (gs *GameState) Render(win *pixelgl.Window) {
 	activeMap := gs.sceneManager.Current.GetMap()
 	activeMap.Render.Draw(win)
 
-	for _, cd := range gs.characters {
-		if cd.Character == nil {
-			continue
-		}
+	for _, item := range gs.items {
+		sprite := item.GetSprite()
+		matrix := item.Sheet.IM()
+		sprite.Draw(win, matrix.Moved(item.Pos))
+	}
 
-		cd.Character.Render(win)
+	for _, cd := range gs.characters {
+		cd.Render(win)
 	}
 }
 
 /*
  * DATA ACCESS AND STATE CONTROL
  */
+
+func (gs *GameState) AddItem(item *items.Item) {
+	gs.items = append(gs.items, item)
+}
+
+func (gs *GameState) GetItem(tp pixel.Vec) *items.Item {
+	maxArea := float64(0)
+	var match *items.Item
+	for _, item := range gs.items {
+		tr := item.PosBounds(tp)
+		ir := item.PosBounds(item.Pos)
+
+		ol := tr.Intersect(ir)
+		if ol.Area() > maxArea {
+			match = item
+			maxArea = ol.Area()
+		}
+	}
+
+	return match
+}
+
+func (gs *GameState) RemoveItem(t *items.Item) {
+	for i, item := range gs.items {
+		if item == t {
+			end := len(gs.items) - 1
+			gs.items[i] = gs.items[end]
+			gs.items[end] = nil
+			gs.items = gs.items[:end]
+			return
+		}
+	}
+}
 
 func (gs *GameState) ShowCharacter(name string, c *characters.Character) {
 	gs.characters[name].Character = c

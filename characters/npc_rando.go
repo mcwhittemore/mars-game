@@ -13,7 +13,8 @@ func NewRando(startRow float64, startPos pixel.Vec) *Character {
 	moves := []string{"down", "up", "side", "left-side"}
 
 	safe := pixel.R(188, 200, 388, 400)
-	rando := NewCharacter(characterSheet, func(c *Character, dt float64, win MindInput) {
+	rando := NewCharacter(characterSheet, func(cd *CharacterData, dt float64, win MindInput) {
+		c := cd.Character
 		select {
 		case <-second:
 			c.ChangePose(moves[rand.Int()%4])
