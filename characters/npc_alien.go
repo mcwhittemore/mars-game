@@ -1,8 +1,6 @@
 package characters
 
 import (
-	"app/sheet"
-
 	"math"
 	"time"
 
@@ -11,11 +9,6 @@ import (
 
 func NewAlien(pos pixel.Vec) *Character {
 	startRow := float64(23)
-
-	characterSheet, err := sheet.NewSheet("characters.png", pixel.Vec{X: 18, Y: 20}, pixel.Vec{X: 0, Y: 2}, 64)
-	if err != nil {
-		panic(err)
-	}
 
 	second := time.Tick(200 * time.Millisecond)
 

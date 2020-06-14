@@ -15,6 +15,16 @@ type Character struct {
 	mind  MindFunc
 }
 
+var characterSheet *sheet.Sheet
+
+func init() {
+	var err error
+	characterSheet, err = sheet.NewSheet("characters.png", pixel.Vec{X: 18, Y: 20}, pixel.Vec{X: 0, Y: 2}, 64)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func NewCharacter(sheet *sheet.Sheet, mind MindFunc) *Character {
 	poses := make(map[string]*Pose)
 	return &Character{

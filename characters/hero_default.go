@@ -1,8 +1,6 @@
 package characters
 
 import (
-	"app/sheet"
-
 	"time"
 
 	"github.com/faiface/pixel"
@@ -10,10 +8,6 @@ import (
 )
 
 func NewHeroDefault(pos pixel.Vec) *Character {
-	characterSheet, err := sheet.NewSheet("characters.png", pixel.Vec{X: 18, Y: 20}, pixel.Vec{X: 0, Y: 2}, 64)
-	if err != nil {
-		panic(err)
-	}
 
 	second := time.Tick(200 * time.Millisecond)
 	hero := NewCharacter(characterSheet, func(c *Character, dt float64, win MindInput) {
