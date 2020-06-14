@@ -3,11 +3,14 @@ package items
 import (
 	"app/sheet"
 
+	"fmt"
+
 	"github.com/faiface/pixel"
 )
 
 type Item struct {
 	Type  ItemType
+	Class string
 	Name  string
 	Sheet *sheet.Sheet
 	Icon  [2]float64
@@ -68,6 +71,7 @@ func init() {
 	itemsDB[0] = Item{
 		Type:  Seed,
 		Name:  "Corn Seed",
+		Class: "Corn",
 		Sheet: cropSheet,
 		Icon:  [2]float64{5, 0},
 		Mind:  nil,
@@ -77,6 +81,7 @@ func init() {
 	itemsDB[1] = Item{
 		Type:  Plant,
 		Name:  "Corn Plant",
+		Class: "Corn",
 		Sheet: cropSheet,
 		Icon:  [2]float64{4, 0},
 		Mind:  nil,
@@ -86,6 +91,7 @@ func init() {
 	itemsDB[2] = Item{
 		Type:  Crop,
 		Name:  "Corn",
+		Class: "Corn",
 		Sheet: cropSheet,
 		Icon:  [2]float64{0, 0},
 		Mind:  nil,
@@ -94,5 +100,27 @@ func init() {
 
 	for i, item := range itemsDB {
 		itemIdxByName[item.Name] = i
+	}
+}
+
+func DropItem(name string, pos pixel.Vec) *Item {
+	item := itemsDB[itemIdxByName[name]]
+	if item.Type == Seed {
+		item = itemsDB[itemIdxByName[fmt.Sprintf("%s Plant", item.Class)]]
+		item.Mind = NewMindCropGrow()
+	}
+	item.Pos = pos
+	return &item
+}
+
+func PickUpItem(item *Item) string {
+	if item == nil || item.CanPickUp() == false {
+		return ""
+	}
+
+	if item.Type == Plant {
+		return item.Class
+	} else {
+		return item.Name
 	}
 }

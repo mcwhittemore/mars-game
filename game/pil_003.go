@@ -29,9 +29,11 @@ func (g *PIL003) SetCamera(cam pixel.Vec) {
 func (g *PIL003) Enter(mi characters.MindInput) {
 	mi.ShowCharacter("hero", characters.NewHeroDefault(pixel.V(500, 600)))
 
-	mi.AddItem(items.NewItem("Corn Seed", pixel.V(600, 700), nil))
-	mi.AddItem(items.NewItem("Corn Seed", pixel.V(600, 732), nil))
-	mi.AddItem(items.NewItem("Corn Seed", pixel.V(600, 764), nil))
+	hero := mi.GetCharacter("hero")
+	for i := 0; i < 200; i++ {
+		hero.AddItem("Corn Seed")
+	}
+
 	mi.AddItem(items.NewItem("Corn Plant", pixel.V(664, 700), items.NewMindCropGrow()))
 }
 

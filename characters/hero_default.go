@@ -1,6 +1,8 @@
 package characters
 
 import (
+	"app/items"
+
 	"fmt"
 	"time"
 
@@ -26,10 +28,17 @@ func NewHeroDefault(pos pixel.Vec) *Character {
 			tp := c.Pos.Add(dir.Scaled(64))
 			fmt.Println(dir, tp)
 			item := mi.GetItem(tp)
-			if item != nil && item.CanPickUp() {
+			myItem := items.PickUpItem(item)
+			if myItem != "" {
 				mi.RemoveItem(item)
-				cd.AddItem(item.Name)
+				cd.AddItem(myItem)
 			}
+		} else if mi.JustPressed(pixelgl.KeyK) && cd.InHands != "" {
+			dir := c.GetDirection()
+			tp := c.Pos.Add(dir.Scaled(64))
+			item := items.DropItem(cd.InHands, tp)
+			mi.AddItem(item)
+			cd.RemoveItem(cd.InHands)
 		}
 
 		if mi.Pressed(pixelgl.KeyD) || mi.Pressed(pixelgl.KeyA) || mi.Pressed(pixelgl.KeyS) || mi.Pressed(pixelgl.KeyW) {

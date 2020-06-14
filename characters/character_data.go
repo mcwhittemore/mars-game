@@ -8,7 +8,7 @@ type CharacterData struct {
 	Name      string
 	Character *Character
 	items     map[string]int
-	inHands   string
+	InHands   string
 }
 
 func (cd *CharacterData) Update(dt float64, mi MindInput) {
@@ -24,7 +24,22 @@ func (cd *CharacterData) Render(win *pixelgl.Window) {
 }
 
 func (cd *CharacterData) AddItem(name string) {
-	cd.items[name]++
+	cd.items[name] = cd.items[name] + 1
+	if cd.InHands == "" {
+		cd.InHands = name
+	}
+}
+
+func (cd *CharacterData) RemoveItem(name string) {
+	cd.items[name]--
+	if cd.items[name] == 0 {
+		delete(cd.items, name)
+		cd.InHands = ""
+		for k := range cd.items {
+			cd.InHands = k
+			return
+		}
+	}
 }
 
 func NewCharacterData(name string) *CharacterData {
@@ -33,6 +48,6 @@ func NewCharacterData(name string) *CharacterData {
 		Name:      name,
 		Character: nil,
 		items:     items,
-		inHands:   "",
+		InHands:   "",
 	}
 }
