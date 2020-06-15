@@ -1,16 +1,16 @@
 package sheet
 
 import (
-	"image"
+	"app/data"
 
+	"image"
 	_ "image/png"
 
 	"github.com/faiface/pixel"
-	"github.com/markbates/pkger"
 )
 
 func loadPicture(path string) (pixel.Picture, error) {
-	file, err := pkger.Open("/" + path)
+	file, err := data.Open("/" + path)
 	if err != nil {
 		return nil, err
 	}
