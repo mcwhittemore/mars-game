@@ -42,6 +42,6 @@ deploy:
   file: C:\Users\travis\gopath\src\github.com\mcwhittemore\mars-game\mars-game-windows.exe
   on:
     repo: mcwhittemore/mars-game
-    branch: travis
+    branch: master
   skip_cleanup: 'true'
   draft: true
