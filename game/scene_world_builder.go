@@ -20,9 +20,58 @@ type WorldBuilder struct {
 }
 
 func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
+
+	if g.mode == "input" {
+		g.inputMode(mi)
+	} else if g.mode == "normal" {
+		g.normalMode(mi)
+	}
+
+	mi.KeepInView(g.Pos.Scaled(64), 128)
+
+	imd := imdraw.New(nil)
+
+	if g.mode == "input" {
+		imd.Color = pixel.RGB(1, 0, 0)
+	} else if g.mode == "normal" {
+		imd.Color = pixel.RGB(0, 0, 1)
+	}
+
+	pos := g.Pos.Scaled(64).Sub(pixel.V(32, 32))
+	imd.Push(pos, pos.Add(pixel.V(64, 64)))
+	imd.Rectangle(2)
+
+	mi.AddDraw(imd)
+}
+
+func (g *WorldBuilder) normalMode(mi characters.MindInput) {
+	pos := g.Pos
+	if mi.JustPressed(pixelgl.KeyA) {
+		pos = g.Pos.Add(pixel.V(-1, 0))
+	} else if mi.JustPressed(pixelgl.KeyW) {
+		pos = g.Pos.Add(pixel.V(0, 1))
+	} else if mi.JustPressed(pixelgl.KeyD) {
+		pos = g.Pos.Add(pixel.V(1, 0))
+	} else if mi.JustPressed(pixelgl.KeyS) {
+		pos = g.Pos.Add(pixel.V(0, -1))
+	} else if mi.JustPressed(pixelgl.KeyI) {
+		g.mode = "input"
+	}
+
+	maxX := len(g.MapOpts.Grid[0])
+	maxY := len(g.MapOpts.Grid)
+
+	if pos.X >= 0 && int(pos.X) < maxX && pos.Y >= 0 && int(pos.Y) < maxY {
+		g.Pos = pos
+	}
+}
+
+func (g *WorldBuilder) inputMode(mi characters.MindInput) {
 	needsNewMap := false
 
-	if mi.JustPressed(pixelgl.KeyJ) {
+	if mi.JustPressed(pixelgl.KeyEscape) {
+		g.mode = "normal"
+	} else if mi.JustPressed(pixelgl.KeyJ) {
 		needsNewMap = true
 		g.TileId++
 		if g.TileId == 13 {
@@ -58,18 +107,6 @@ func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 		g.MapOpts.Grid[maxY-y][x] = g.TileId
 		g.Ground = maps.NewMap(g.MapOpts)
 	}
-
-	mi.KeepInView(g.Pos.Scaled(64), 128)
-
-	imd := imdraw.New(nil)
-
-	imd.Color = pixel.RGB(1, 0, 0)
-
-	pos := g.Pos.Scaled(64).Sub(pixel.V(32, 32))
-	imd.Push(pos, pos.Add(pixel.V(64, 64)))
-	imd.Rectangle(2)
-
-	mi.AddDraw(imd)
 }
 
 func (g *WorldBuilder) setMinMax() {
