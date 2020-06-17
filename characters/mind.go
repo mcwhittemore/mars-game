@@ -4,6 +4,7 @@ import (
 	"app/items"
 
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 )
 
@@ -22,6 +23,7 @@ type MindInput interface {
 	AddItem(*items.Item)
 	GetItem(pixel.Vec) *items.Item
 	RemoveItem(*items.Item)
+	AddDraw(*imdraw.IMDraw)
 }
 
 type MindFunc func(*CharacterData, float64, MindInput)

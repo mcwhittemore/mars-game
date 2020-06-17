@@ -28,6 +28,7 @@ func run() {
 	gs.AddScene("game-001", game.NewPIL001)
 	gs.AddScene("game-002", game.NewPIL002)
 	gs.AddScene("game-003", game.NewPIL003)
+	gs.AddScene("world-builder", game.NewWorldBuilder)
 
 	gs.AddCharacter("hero", nil)
 
@@ -36,7 +37,9 @@ func run() {
 		id = os.Args[1]
 	}
 
-	if id == "1" {
+	if id == "world-builder" {
+		gs.ChangeScene("world-builder")
+	} else if id == "1" {
 		gs.ChangeScene("game-001")
 	} else if id == "2" {
 		gs.ChangeScene("game-002")

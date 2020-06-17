@@ -7,12 +7,14 @@ import (
 	"fmt"
 
 	"github.com/faiface/pixel"
+	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 )
 
 type GameState struct {
 	characters   map[string]*characters.CharacterData
 	items        []*items.Item
+	draws        []*imdraw.IMDraw
 	sceneManager *SceneManager
 	gameTime     float64
 	win          *pixelgl.Window
@@ -65,11 +67,22 @@ func (gs *GameState) Render(win *pixelgl.Window) {
 	for _, cd := range gs.characters {
 		cd.Render(win)
 	}
+
+	for _, imd := range gs.draws {
+		imd.Draw(win)
+	}
+
+	// keeps cap but sets len to 0
+	gs.draws = gs.draws[:0]
 }
 
 /*
  * DATA ACCESS AND STATE CONTROL
  */
+
+func (gs *GameState) AddDraw(imd *imdraw.IMDraw) {
+	gs.draws = append(gs.draws, imd)
+}
 
 func (gs *GameState) AddItem(item *items.Item) {
 	gs.items = append(gs.items, item)
