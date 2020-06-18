@@ -34,7 +34,7 @@ func (f *File) Read(p []byte) (n int, err error) {
 	f.read += i
 
 	// Say this is the end of the file
-	if f.read == t {
+	if i == 0 {
 		return i, io.EOF
 	}
 

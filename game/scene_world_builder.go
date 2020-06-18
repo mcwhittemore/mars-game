@@ -5,6 +5,10 @@ import (
 	"app/maps"
 	"app/sheet"
 
+	"encoding/json"
+	"io/ioutil"
+	"os"
+
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
@@ -17,6 +21,7 @@ type WorldBuilder struct {
 	Ground  *maps.Map
 	Pos     pixel.Vec
 	TileId  int
+	path    string
 }
 
 func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
@@ -71,6 +76,7 @@ func (g *WorldBuilder) inputMode(mi characters.MindInput) {
 
 	if mi.JustPressed(pixelgl.KeyEscape) {
 		g.mode = "normal"
+		g.save()
 	} else if mi.JustPressed(pixelgl.KeyJ) {
 		needsNewMap = true
 		g.TileId++
@@ -196,6 +202,7 @@ func NewWorldBuilder() Scene {
 		cam:     pixel.V(0, 0),
 		Pos:     pixel.V(0, 0),
 		TileId:  0,
+		path:    "",
 	}
 }
 
@@ -211,8 +218,29 @@ func (g *WorldBuilder) SetCamera(cam pixel.Vec) {
 	g.cam = cam
 }
 
+func (g *WorldBuilder) save() {
+	b, err := json.Marshal(g.MapOpts)
+	if err != nil {
+		panic(err)
+	}
+	err = ioutil.WriteFile(g.path, b, 0644)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func (g *WorldBuilder) Enter(mi characters.MindInput) {
-	// Load map data
+	g.path = os.Args[2]
+	file, err := ioutil.ReadFile(g.path)
+	sheet := g.MapOpts.Sheet
+	if err == nil {
+		err = json.Unmarshal(file, g.MapOpts)
+		if err != nil {
+			panic(err)
+		}
+		g.MapOpts.Sheet = sheet
+		g.Ground = maps.NewMap(g.MapOpts)
+	}
 }
 
 func (g *WorldBuilder) Exit(mi characters.MindInput) {

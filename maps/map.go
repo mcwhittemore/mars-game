@@ -1,9 +1,12 @@
 package maps
 
 import (
+	"app/data"
 	"app/sheet"
 
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/faiface/pixel"
 )
@@ -36,6 +39,27 @@ func (m *Map) IsObstacle(pos pixel.Vec) bool {
 		return m.gridTypes[y][x] != 0
 	}
 	return false
+}
+
+func NewMapFromFile(path string, sheet *sheet.Sheet) *Map {
+	opts := &MapOpts{}
+	file, err := data.Open(path)
+	if err != nil {
+		panic(err)
+	}
+
+	b, err := ioutil.ReadAll(file)
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal(b, opts)
+	if err != nil {
+		panic(err)
+	}
+
+	opts.Sheet = sheet
+	return NewMap(opts)
 }
 
 func NewMap(opts *MapOpts) *Map {

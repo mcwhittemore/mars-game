@@ -28,12 +28,13 @@ func run() {
 	gs.AddScene("game-001", game.NewPIL001)
 	gs.AddScene("game-002", game.NewPIL002)
 	gs.AddScene("game-003", game.NewPIL003)
+	gs.AddScene("game-004", game.NewPIL004)
 	gs.AddScene("world-builder", game.NewWorldBuilder)
 
 	gs.AddCharacter("hero", nil)
 
-	id := "3"
-	if len(os.Args) == 2 {
+	id := "4"
+	if len(os.Args) > 1 {
 		id = os.Args[1]
 	}
 
@@ -45,6 +46,8 @@ func run() {
 		gs.ChangeScene("game-002")
 	} else if id == "3" {
 		gs.ChangeScene("game-003")
+	} else if id == "4" {
+		gs.ChangeScene("game-004")
 	} else {
 		panic("Unexpected game trying to load: " + id)
 	}
