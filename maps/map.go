@@ -18,10 +18,12 @@ type MapOpts struct {
 	Tiles     []*Tile
 	TileTypes []int
 	Grid      [][]int
+	Locations map[string]pixel.Rect
 }
 
 type Map struct {
 	Render    *pixel.Batch
+	Locations map[string]pixel.Rect
 	tileDim   float64
 	gridTypes [][]int
 }
@@ -97,10 +99,16 @@ func NewMap(opts *MapOpts) *Map {
 		}
 	}
 
+	loc := opts.Locations
+	if loc == nil {
+		loc = make(map[string]pixel.Rect)
+	}
+
 	return &Map{
 		Render:    batch,
 		tileDim:   dim,
 		gridTypes: gridTypes,
+		Locations: loc,
 	}
 
 }

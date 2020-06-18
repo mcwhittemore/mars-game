@@ -15,13 +15,14 @@ import (
 )
 
 type WorldBuilder struct {
-	mode    string
-	cam     pixel.Vec
-	MapOpts *maps.MapOpts
-	Ground  *maps.Map
-	Pos     pixel.Vec
-	TileId  int
-	path    string
+	mode         string
+	cam          pixel.Vec
+	MapOpts      *maps.MapOpts
+	Ground       *maps.Map
+	Pos          pixel.Vec
+	TileId       int
+	path         string
+	locationName string
 }
 
 func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
@@ -30,6 +31,10 @@ func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 		g.inputMode(mi)
 	} else if g.mode == "normal" {
 		g.normalMode(mi)
+	} else if g.mode == "location" {
+		g.locationMode(mi)
+	} else if g.mode == "new-location" {
+		g.newLocationMode(mi)
 	}
 
 	mi.KeepInView(g.Pos.Scaled(64), 128)
@@ -40,13 +45,96 @@ func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 		imd.Color = pixel.RGB(1, 0, 0)
 	} else if g.mode == "normal" {
 		imd.Color = pixel.RGB(0, 0, 1)
+	} else if g.mode == "location" || g.mode == "new-location" {
+		imd.Color = pixel.RGB(0, 1, 0)
 	}
 
 	pos := g.Pos.Scaled(64).Sub(pixel.V(32, 32))
 	imd.Push(pos, pos.Add(pixel.V(64, 64)))
 	imd.Rectangle(2)
 
+	for _, loc := range g.MapOpts.Locations {
+		imd.Push(loc.Min, loc.Max)
+		imd.Rectangle(2)
+	}
+
 	mi.AddDraw(imd)
+}
+
+func (g *WorldBuilder) newLocationMode(mi characters.MindInput) {
+	if mi.JustPressed(pixelgl.KeyEscape) {
+		g.mode = "normal"
+		g.locationName = ""
+		return
+	}
+	g.locationName += mi.Typed()
+
+	if mi.JustPressed(pixelgl.KeyEnter) {
+		for i, v := range g.locationName {
+			if string(v) == "\n" {
+				g.locationName = g.locationName[0 : i-1]
+				break
+			}
+		}
+
+		pos := g.Pos.Scaled(64).Sub(pixel.V(32, 32))
+		g.MapOpts.Locations[g.locationName] = pixel.Rect{
+			Min: pos,
+			Max: pos.Add(pixel.V(64, 64)),
+		}
+		g.mode = "location"
+	}
+}
+
+func (g *WorldBuilder) locationMode(mi characters.MindInput) {
+	pos := g.Pos
+	if mi.JustPressed(pixelgl.KeyA) {
+		pos = g.Pos.Add(pixel.V(-1, 0))
+	} else if mi.JustPressed(pixelgl.KeyW) {
+		pos = g.Pos.Add(pixel.V(0, 1))
+	} else if mi.JustPressed(pixelgl.KeyD) {
+		pos = g.Pos.Add(pixel.V(1, 0))
+	} else if mi.JustPressed(pixelgl.KeyS) {
+		pos = g.Pos.Add(pixel.V(0, -1))
+	} else if mi.JustPressed(pixelgl.KeyEscape) {
+		delete(g.MapOpts.Locations, g.locationName)
+		g.locationName = ""
+		g.mode = "normal"
+		return
+	} else if mi.JustPressed(pixelgl.KeyEnter) {
+		g.locationName = ""
+		g.mode = "normal"
+		g.save()
+		return
+	}
+
+	maxX := len(g.MapOpts.Grid[0])
+	maxY := len(g.MapOpts.Grid)
+
+	if pos.X >= 0 && int(pos.X) < maxX && pos.Y >= 0 && int(pos.Y) < maxY {
+		g.Pos = pos
+	}
+
+	min := g.Pos.Scaled(64).Sub(pixel.V(32, 32))
+	max := min.Add(pixel.V(64, 64))
+
+	box := g.MapOpts.Locations[g.locationName]
+
+	if box.Min.X > min.X {
+		box.Min.X = min.X
+	}
+	if box.Max.X < max.X {
+		box.Max.X = max.X
+	}
+
+	if box.Min.Y > min.Y {
+		box.Min.Y = min.Y
+	}
+	if box.Max.Y < max.Y {
+		box.Max.Y = max.Y
+	}
+
+	g.MapOpts.Locations[g.locationName] = box
 }
 
 func (g *WorldBuilder) normalMode(mi characters.MindInput) {
@@ -61,6 +149,8 @@ func (g *WorldBuilder) normalMode(mi characters.MindInput) {
 		pos = g.Pos.Add(pixel.V(0, -1))
 	} else if mi.JustPressed(pixelgl.KeyI) {
 		g.mode = "input"
+	} else if mi.JustPressed(pixelgl.KeyL) {
+		g.mode = "new-location"
 	}
 
 	maxX := len(g.MapOpts.Grid[0])
@@ -239,6 +329,9 @@ func (g *WorldBuilder) Enter(mi characters.MindInput) {
 			panic(err)
 		}
 		g.MapOpts.Sheet = sheet
+		if g.MapOpts.Locations == nil {
+			g.MapOpts.Locations = make(map[string]pixel.Rect)
+		}
 		g.Ground = maps.NewMap(g.MapOpts)
 	}
 }

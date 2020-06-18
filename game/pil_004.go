@@ -2,7 +2,6 @@ package game
 
 import (
 	"app/characters"
-	"app/items"
 	"app/maps"
 	"app/sheet"
 
@@ -28,13 +27,6 @@ func (g *PIL004) SetCamera(cam pixel.Vec) {
 
 func (g *PIL004) Enter(mi characters.MindInput) {
 	mi.ShowCharacter("hero", characters.NewHeroDefault(pixel.V(500, 600)))
-
-	hero := mi.GetCharacter("hero")
-	for i := 0; i < 200; i++ {
-		hero.AddItem("Corn Seed")
-	}
-
-	mi.AddItem(items.NewItem("Corn Plant", pixel.V(664, 700), items.NewMindCropGrow()))
 }
 
 func (g *PIL004) Exit(mi characters.MindInput) {

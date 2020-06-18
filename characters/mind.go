@@ -11,6 +11,7 @@ import (
 type MindInput interface {
 	JustPressed(pixelgl.Button) bool
 	Pressed(pixelgl.Button) bool
+	Typed() string
 	GetCollideRect(pixel.Rect, interface{}) (pixel.Rect, *Character)
 	KeepInView(pixel.Vec, float64)
 	IsObstacle(pixel.Vec) bool

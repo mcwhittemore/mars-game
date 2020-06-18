@@ -201,6 +201,10 @@ func (gs *GameState) Pressed(button pixelgl.Button) bool {
 	return gs.win.Pressed(button)
 }
 
+func (gs *GameState) Typed() string {
+	return gs.win.Typed()
+}
+
 func (gs *GameState) KeepInView(pos pixel.Vec, buffer float64) {
 	bds := gs.win.Bounds()
 	campos := gs.sceneManager.Current.GetCamera()
