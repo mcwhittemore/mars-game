@@ -7,14 +7,12 @@ import (
 	"app/sheet"
 
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
-	"github.com/faiface/pixel/text"
 )
 
 type WorldBuilder struct {
@@ -59,8 +57,7 @@ func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 
 	imd.Color = pixel.RGB(1, 1, 0)
 	for name, loc := range g.MapOpts.Locations {
-		txt := text.New(loc.Min, fonts.Basic)
-		fmt.Fprintln(txt, name)
+		txt := fonts.NewText(name, loc.Min.Add(pixel.V(2, 2)))
 		mi.AddText(txt)
 		imd.Push(loc.Min, loc.Max)
 		imd.Rectangle(2)
@@ -77,6 +74,7 @@ func (g *WorldBuilder) newLocationMode(mi characters.MindInput) {
 	}
 	g.locationName += mi.Typed()
 
+	pos := g.Pos.Scaled(64).Sub(pixel.V(32, 32))
 	if mi.JustPressed(pixelgl.KeyEnter) {
 		for i, v := range g.locationName {
 			if string(v) == "\n" {
@@ -85,12 +83,13 @@ func (g *WorldBuilder) newLocationMode(mi characters.MindInput) {
 			}
 		}
 
-		pos := g.Pos.Scaled(64).Sub(pixel.V(32, 32))
 		g.MapOpts.Locations[g.locationName] = pixel.Rect{
 			Min: pos,
 			Max: pos.Add(pixel.V(64, 64)),
 		}
 		g.mode = "location"
+	} else {
+		mi.AddText(fonts.NewText(g.locationName, pos.Add(pixel.V(2, 2))))
 	}
 }
 
