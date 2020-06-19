@@ -81,6 +81,12 @@ func (g *WorldBuilder) newLocationMode(mi characters.MindInput) {
 	}
 	g.locationName += mi.Typed()
 
+	if mi.JustPressed(pixelgl.KeyDelete) || mi.JustPressed(pixelgl.KeyBackspace) {
+		if len(g.locationName) > 0 {
+			g.locationName = g.locationName[:len(g.locationName)-1]
+		}
+	}
+
 	if mi.JustPressed(pixelgl.KeyEnter) {
 		for i, v := range g.locationName {
 			if string(v) == "\n" {
