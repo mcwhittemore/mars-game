@@ -2,16 +2,19 @@ package game
 
 import (
 	"app/characters"
+	"app/fonts"
 	"app/maps"
 	"app/sheet"
 
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/faiface/pixel/text"
 )
 
 type WorldBuilder struct {
@@ -54,7 +57,10 @@ func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 	imd.Rectangle(2)
 
 	imd.Color = pixel.RGB(1, 1, 0)
-	for _, loc := range g.MapOpts.Locations {
+	for name, loc := range g.MapOpts.Locations {
+		txt := text.New(loc.Min, fonts.Basic)
+		fmt.Fprintln(txt, name)
+		mi.AddText(txt)
 		imd.Push(loc.Min, loc.Max)
 		imd.Rectangle(2)
 	}
