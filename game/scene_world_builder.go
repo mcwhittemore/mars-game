@@ -7,6 +7,7 @@ import (
 	"app/sheet"
 
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -56,6 +57,8 @@ func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 	}
 
 	pos := g.Pos.Scaled(dim).Sub(pixel.V(dim/2, dim/2))
+	abt := fmt.Sprintf("x: %d/%d\ny: %d/%d", int(g.Pos.X), len(g.MapOpts.Grid[0]), int(g.Pos.Y), len(g.MapOpts.Grid))
+	mi.AddText(fonts.NewText(abt, pos.Add(pixel.V(0, dim*.8))))
 	imd.Push(pos, pos.Add(pixel.V(dim, dim)))
 	imd.Rectangle(2)
 
