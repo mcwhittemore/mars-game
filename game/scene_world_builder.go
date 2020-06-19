@@ -53,6 +53,7 @@ func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 	imd.Push(pos, pos.Add(pixel.V(64, 64)))
 	imd.Rectangle(2)
 
+	imd.Color = pixel.RGB(1, 1, 0)
 	for _, loc := range g.MapOpts.Locations {
 		imd.Push(loc.Min, loc.Max)
 		imd.Rectangle(2)
@@ -170,14 +171,14 @@ func (g *WorldBuilder) inputMode(mi characters.MindInput) {
 	} else if mi.JustPressed(pixelgl.KeyJ) {
 		needsNewMap = true
 		g.TileId++
-		if g.TileId == 13 {
+		if g.TileId == len(g.MapOpts.TileTypes) {
 			g.TileId = 0
 		}
 	} else if mi.JustPressed(pixelgl.KeyK) {
 		needsNewMap = true
 		g.TileId--
 		if g.TileId == -1 {
-			g.TileId = 12
+			g.TileId = len(g.MapOpts.TileTypes) - 1
 		}
 	} else if mi.JustPressed(pixelgl.KeyA) {
 		needsNewMap = true
