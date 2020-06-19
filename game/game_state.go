@@ -80,6 +80,7 @@ func (gs *GameState) Render(win *pixelgl.Window) {
 
 	// keeps cap but sets len to 0
 	gs.draws = gs.draws[:0]
+	gs.texts = gs.texts[:0]
 }
 
 /*
