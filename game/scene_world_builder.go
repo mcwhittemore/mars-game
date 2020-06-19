@@ -37,6 +37,8 @@ func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 		g.locationMode(mi)
 	} else if g.mode == "new-location" {
 		g.newLocationMode(mi)
+	} else if g.mode == "remove" {
+		g.removeMode(mi)
 	}
 
 	mi.KeepInView(g.Pos.Scaled(64), 128)
@@ -144,6 +146,19 @@ func (g *WorldBuilder) locationMode(mi characters.MindInput) {
 	g.MapOpts.Locations[g.locationName] = box
 }
 
+func (g *WorldBuilder) removeMode(mi characters.MindInput) {
+	if mi.JustPressed(pixelgl.KeyL) {
+		pos := g.Pos.Scaled(64)
+		loc, _ := g.Ground.GetLocationAt(pos)
+		delete(g.MapOpts.Locations, loc)
+		g.Ground = maps.NewMap(g.MapOpts)
+		g.save()
+		g.mode = "normal"
+	} else if mi.JustPressed(pixelgl.KeyEscape) {
+		g.mode = "normal"
+	}
+}
+
 func (g *WorldBuilder) normalMode(mi characters.MindInput) {
 	pos := g.Pos
 	if mi.JustPressed(pixelgl.KeyA) {
@@ -158,6 +173,8 @@ func (g *WorldBuilder) normalMode(mi characters.MindInput) {
 		g.mode = "input"
 	} else if mi.JustPressed(pixelgl.KeyL) {
 		g.mode = "new-location"
+	} else if mi.JustPressed(pixelgl.KeyR) {
+		g.mode = "remove"
 	}
 
 	maxX := len(g.MapOpts.Grid[0])

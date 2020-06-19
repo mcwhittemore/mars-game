@@ -24,6 +24,17 @@ type Map struct {
 	gridTypes [][]int
 }
 
+func (m *Map) GetLocationAt(pos pixel.Vec) (string, pixel.Rect) {
+
+	for name, rect := range m.Locations {
+		if rect.Contains(pos) {
+			return name, rect
+		}
+	}
+
+	return "", pixel.ZR
+}
+
 func (m *Map) IsObstacle(pos pixel.Vec) bool {
 	x := int(pos.X / m.tileDim)
 	y := int(pos.Y / m.tileDim)
