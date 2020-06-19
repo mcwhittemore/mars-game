@@ -107,16 +107,23 @@ func NewMap(opts *MapOpts) *Map {
 		}
 	}
 
-	loc := opts.Locations
-	if loc == nil {
-		loc = make(map[string]pixel.Rect)
+	locs := make(map[string]pixel.Rect)
+	if opts.Locations != nil {
+		for name, loc := range opts.Locations {
+			lMin := loc.Min.Scaled(dim).Sub(pixel.V(dim/2, dim/2))
+			lMax := loc.Max.Scaled(dim).Sub(pixel.V(dim/2, dim/2))
+			locs[name] = pixel.Rect{
+				Max: lMax,
+				Min: lMin,
+			}
+		}
 	}
 
 	return &Map{
 		Render:    batch,
 		tileDim:   dim,
 		gridTypes: gridTypes,
-		Locations: loc,
+		Locations: locs,
 	}
 
 }

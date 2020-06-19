@@ -29,6 +29,8 @@ type WorldBuilder struct {
 
 func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 
+	dim := float64(64)
+
 	if g.mode == "input" {
 		g.inputMode(mi)
 	} else if g.mode == "normal" {
@@ -41,7 +43,7 @@ func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 		g.removeMode(mi)
 	}
 
-	mi.KeepInView(g.Pos.Scaled(64), 128)
+	mi.KeepInView(g.Pos.Scaled(dim), 128)
 
 	imd := imdraw.New(nil)
 
@@ -53,15 +55,18 @@ func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 		imd.Color = pixel.RGB(0, 1, 0)
 	}
 
-	pos := g.Pos.Scaled(64).Sub(pixel.V(32, 32))
-	imd.Push(pos, pos.Add(pixel.V(64, 64)))
+	pos := g.Pos.Scaled(dim).Sub(pixel.V(dim/2, dim/2))
+	imd.Push(pos, pos.Add(pixel.V(dim, dim)))
 	imd.Rectangle(2)
 
 	imd.Color = pixel.RGB(1, 1, 0)
 	for name, loc := range g.MapOpts.Locations {
-		txt := fonts.NewText(name, loc.Min.Add(pixel.V(2, 2)))
+		lMin := loc.Min.Scaled(dim).Sub(pixel.V(dim/2, dim/2))
+		lMax := loc.Max.Scaled(dim).Sub(pixel.V(dim/2, dim/2))
+
+		txt := fonts.NewText(name, lMin.Add(pixel.V(2, 2)))
 		mi.AddText(txt)
-		imd.Push(loc.Min, loc.Max)
+		imd.Push(lMin, lMax)
 		imd.Rectangle(2)
 	}
 
@@ -76,7 +81,6 @@ func (g *WorldBuilder) newLocationMode(mi characters.MindInput) {
 	}
 	g.locationName += mi.Typed()
 
-	pos := g.Pos.Scaled(64).Sub(pixel.V(32, 32))
 	if mi.JustPressed(pixelgl.KeyEnter) {
 		for i, v := range g.locationName {
 			if string(v) == "\n" {
@@ -86,64 +90,74 @@ func (g *WorldBuilder) newLocationMode(mi characters.MindInput) {
 		}
 
 		g.MapOpts.Locations[g.locationName] = pixel.Rect{
-			Min: pos,
-			Max: pos.Add(pixel.V(64, 64)),
+			Min: g.Pos,
+			Max: g.Pos.Add(pixel.V(1, 1)),
 		}
 		g.mode = "location"
 	} else {
+		pos := g.Pos.Scaled(64).Sub(pixel.V(32, 32))
 		mi.AddText(fonts.NewText(g.locationName, pos.Add(pixel.V(2, 2))))
 	}
 }
 
 func (g *WorldBuilder) locationMode(mi characters.MindInput) {
 	pos := g.Pos
+	moveUpdate := false
 	if mi.JustPressed(pixelgl.KeyA) {
 		pos = g.Pos.Add(pixel.V(-1, 0))
+		moveUpdate = true
 	} else if mi.JustPressed(pixelgl.KeyW) {
 		pos = g.Pos.Add(pixel.V(0, 1))
+		moveUpdate = true
 	} else if mi.JustPressed(pixelgl.KeyD) {
 		pos = g.Pos.Add(pixel.V(1, 0))
+		moveUpdate = true
 	} else if mi.JustPressed(pixelgl.KeyS) {
 		pos = g.Pos.Add(pixel.V(0, -1))
+		moveUpdate = true
 	} else if mi.JustPressed(pixelgl.KeyEscape) {
 		delete(g.MapOpts.Locations, g.locationName)
 		g.locationName = ""
 		g.mode = "normal"
 		return
 	} else if mi.JustPressed(pixelgl.KeyEnter) {
-		g.locationName = ""
 		g.mode = "normal"
+		g.Ground = maps.NewMap(g.MapOpts)
+		g.locationName = ""
 		g.save()
 		return
 	}
 
-	maxX := len(g.MapOpts.Grid[0])
-	maxY := len(g.MapOpts.Grid)
+	if moveUpdate {
+		maxX := len(g.MapOpts.Grid[0])
+		maxY := len(g.MapOpts.Grid)
 
-	if pos.X >= 0 && int(pos.X) < maxX && pos.Y >= 0 && int(pos.Y) < maxY {
-		g.Pos = pos
+		if pos.X >= 0 && int(pos.X) < maxX && pos.Y >= 0 && int(pos.Y) < maxY {
+			g.Pos = pos
+		}
+
+		min := g.Pos
+		max := min.Add(pixel.V(1, 1))
+
+		box := g.MapOpts.Locations[g.locationName]
+
+		if box.Min.X > min.X {
+			box.Min.X = min.X
+		}
+		if box.Max.X < max.X {
+			box.Max.X = max.X
+		}
+
+		if box.Min.Y > min.Y {
+			box.Min.Y = min.Y
+		}
+		if box.Max.Y < max.Y {
+			box.Max.Y = max.Y
+		}
+
+		g.MapOpts.Locations[g.locationName] = box
 	}
 
-	min := g.Pos.Scaled(64).Sub(pixel.V(32, 32))
-	max := min.Add(pixel.V(64, 64))
-
-	box := g.MapOpts.Locations[g.locationName]
-
-	if box.Min.X > min.X {
-		box.Min.X = min.X
-	}
-	if box.Max.X < max.X {
-		box.Max.X = max.X
-	}
-
-	if box.Min.Y > min.Y {
-		box.Min.Y = min.Y
-	}
-	if box.Max.Y < max.Y {
-		box.Max.Y = max.Y
-	}
-
-	g.MapOpts.Locations[g.locationName] = box
 }
 
 func (g *WorldBuilder) removeMode(mi characters.MindInput) {
