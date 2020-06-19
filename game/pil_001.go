@@ -3,7 +3,6 @@ package game
 import (
 	"app/characters"
 	"app/maps"
-	"app/sheet"
 
 	"github.com/faiface/pixel"
 )
@@ -73,7 +72,7 @@ func (g *PIL001) Update(dt float64, mi characters.MindInput) {
 func NewPIL001() Scene {
 
 	mapOne := maps.NewMap(&maps.MapOpts{
-		Sheet: sheet.GroundTileSheet,
+		Sheet: "ground-tile-sheet",
 		Grid: [][]int{
 			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

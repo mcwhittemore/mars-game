@@ -22,6 +22,7 @@ type WorldBuilder struct {
 	cam          pixel.Vec
 	MapOpts      *maps.MapOpts
 	Ground       *maps.Map
+	TileSheet    *sheet.TileSheet
 	Pos          pixel.Vec
 	TileId       int
 	path         string
@@ -177,14 +178,14 @@ func (g *WorldBuilder) inputMode(mi characters.MindInput) {
 	} else if mi.JustPressed(pixelgl.KeyJ) {
 		needsNewMap = true
 		g.TileId++
-		if g.TileId == len(g.MapOpts.Sheet.TileTypes) {
+		if g.TileId == len(g.TileSheet.TileTypes) {
 			g.TileId = 0
 		}
 	} else if mi.JustPressed(pixelgl.KeyK) {
 		needsNewMap = true
 		g.TileId--
 		if g.TileId == -1 {
-			g.TileId = len(g.MapOpts.Sheet.TileTypes) - 1
+			g.TileId = len(g.TileSheet.TileTypes) - 1
 		}
 	} else if mi.JustPressed(pixelgl.KeyA) {
 		needsNewMap = true
@@ -264,7 +265,7 @@ func (g *WorldBuilder) addRow(toEnd bool) {
 func NewWorldBuilder() Scene {
 
 	opts := &maps.MapOpts{
-		Sheet: sheet.GroundTileSheet,
+		Sheet: "ground-tile-sheet",
 		Grid: [][]int{
 			{0},
 		},
@@ -273,13 +274,14 @@ func NewWorldBuilder() Scene {
 	mapOne := maps.NewMap(opts)
 
 	return &WorldBuilder{
-		mode:    "normal",
-		Ground:  mapOne,
-		MapOpts: opts,
-		cam:     pixel.V(0, 0),
-		Pos:     pixel.V(0, 0),
-		TileId:  0,
-		path:    "",
+		mode:      "normal",
+		Ground:    mapOne,
+		MapOpts:   opts,
+		TileSheet: sheet.GetTileSheet(opts.Sheet),
+		cam:       pixel.V(0, 0),
+		Pos:       pixel.V(0, 0),
+		TileId:    0,
+		path:      "",
 	}
 }
 

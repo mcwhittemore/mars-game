@@ -12,7 +12,7 @@ import (
 )
 
 type MapOpts struct {
-	Sheet     *sheet.TileSheet
+	Sheet     string
 	Grid      [][]int
 	Locations map[string]pixel.Rect
 }
@@ -39,7 +39,7 @@ func (m *Map) IsObstacle(pos pixel.Vec) bool {
 	return false
 }
 
-func NewMapFromFile(path string, sheet *sheet.TileSheet) *Map {
+func NewMapFromFile(path string) *Map {
 	opts := &MapOpts{}
 	file, err := data.Open(path)
 	if err != nil {
@@ -56,28 +56,29 @@ func NewMapFromFile(path string, sheet *sheet.TileSheet) *Map {
 		panic(err)
 	}
 
-	opts.Sheet = sheet
 	return NewMap(opts)
 }
 
 func NewMap(opts *MapOpts) *Map {
 
-	dim := opts.Sheet.Sheet.GetDim()
+	sheet := sheet.GetTileSheet(opts.Sheet)
+
+	dim := sheet.Sheet.GetDim()
 
 	sprites := make([]*pixel.Sprite, 0)
 
-	ttlen := len(opts.Sheet.TileTypes)
-	tlen := len(opts.Sheet.Tiles)
+	ttlen := len(sheet.TileTypes)
+	tlen := len(sheet.Tiles)
 
 	if ttlen != tlen {
 		panic(fmt.Sprintf("Expected Tiles (%d) and TileTypes (%d) to have the same length", tlen, ttlen))
 	}
 
-	for _, tile := range opts.Sheet.Tiles {
-		sprites = append(sprites, opts.Sheet.Sheet.GetSprite(tile[0], tile[1]))
+	for _, tile := range sheet.Tiles {
+		sprites = append(sprites, sheet.Sheet.GetSprite(tile[0], tile[1]))
 	}
 
-	batch := opts.Sheet.Sheet.GetBatch()
+	batch := sheet.Sheet.GetBatch()
 
 	right := pixel.Vec{X: dim, Y: 0}
 
@@ -89,8 +90,8 @@ func NewMap(opts *MapOpts) *Map {
 		rowTypes := make([]int, len(row))
 		gridTypes[y] = rowTypes
 		for x, tileId := range row {
-			rowTypes[x] = opts.Sheet.TileTypes[tileId]
-			sprites[tileId].Draw(batch, opts.Sheet.Sheet.IM().Moved(place))
+			rowTypes[x] = sheet.TileTypes[tileId]
+			sprites[tileId].Draw(batch, sheet.Sheet.IM().Moved(place))
 			place = place.Add(right)
 		}
 	}

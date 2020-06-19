@@ -18,3 +18,10 @@ func init() {
 		TileTypes: []int{0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 	}
 }
+
+func GetTileSheet(name string) *TileSheet {
+	if name == "ground-tile-sheet" {
+		return GroundTileSheet
+	}
+	panic("Unknown tilesheet: " + name)
+}

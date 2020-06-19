@@ -3,7 +3,6 @@ package game
 import (
 	"app/characters"
 	"app/maps"
-	"app/sheet"
 
 	"github.com/faiface/pixel"
 )
@@ -40,7 +39,7 @@ func (g *PIL004) Update(dt float64, mind characters.MindInput) {
 
 func NewPIL004() Scene {
 
-	base := maps.NewMapFromFile("/maps/base.json", sheet.GroundTileSheet)
+	base := maps.NewMapFromFile("/maps/base.json")
 
 	return &PIL004{
 		ground: base,
