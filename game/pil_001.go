@@ -72,15 +72,8 @@ func (g *PIL001) Update(dt float64, mi characters.MindInput) {
 
 func NewPIL001() Scene {
 
-	groundSheet, err := sheet.NewSheet("crater.png", pixel.Vec{X: 20, Y: 20}, pixel.ZV, 64)
-	if err != nil {
-		panic(err)
-	}
-
 	mapOne := maps.NewMap(&maps.MapOpts{
-		Sheet:     groundSheet,
-		Tiles:     []*maps.Tile{{2, 6}, {0, 4}, {2, 4}, {4, 4}, {4, 6}, {4, 8}, {2, 8}, {0, 8}, {0, 6}},
-		TileTypes: []int{0, 0, 0, 0, 0, 0, 0, 0, 0},
+		Sheet: sheet.GroundTileSheet,
 		Grid: [][]int{
 			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 			{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

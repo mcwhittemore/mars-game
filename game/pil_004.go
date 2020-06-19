@@ -40,12 +40,7 @@ func (g *PIL004) Update(dt float64, mind characters.MindInput) {
 
 func NewPIL004() Scene {
 
-	groundSheet, err := sheet.NewSheet("crater.png", pixel.Vec{X: 20, Y: 20}, pixel.ZV, 64)
-	if err != nil {
-		panic(err)
-	}
-
-	base := maps.NewMapFromFile("/maps/base.json", groundSheet)
+	base := maps.NewMapFromFile("/maps/base.json", sheet.GroundTileSheet)
 
 	return &PIL004{
 		ground: base,

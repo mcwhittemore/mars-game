@@ -11,12 +11,8 @@ import (
 	"github.com/faiface/pixel"
 )
 
-type Tile [2]float64
-
 type MapOpts struct {
-	Sheet     *sheet.Sheet
-	Tiles     []*Tile
-	TileTypes []int
+	Sheet     *sheet.TileSheet
 	Grid      [][]int
 	Locations map[string]pixel.Rect
 }
@@ -43,7 +39,7 @@ func (m *Map) IsObstacle(pos pixel.Vec) bool {
 	return false
 }
 
-func NewMapFromFile(path string, sheet *sheet.Sheet) *Map {
+func NewMapFromFile(path string, sheet *sheet.TileSheet) *Map {
 	opts := &MapOpts{}
 	file, err := data.Open(path)
 	if err != nil {
@@ -66,22 +62,22 @@ func NewMapFromFile(path string, sheet *sheet.Sheet) *Map {
 
 func NewMap(opts *MapOpts) *Map {
 
-	dim := opts.Sheet.GetDim()
+	dim := opts.Sheet.Sheet.GetDim()
 
 	sprites := make([]*pixel.Sprite, 0)
 
-	ttlen := len(opts.TileTypes)
-	tlen := len(opts.Tiles)
+	ttlen := len(opts.Sheet.TileTypes)
+	tlen := len(opts.Sheet.Tiles)
 
 	if ttlen != tlen {
 		panic(fmt.Sprintf("Expected Tiles (%d) and TileTypes (%d) to have the same length", tlen, ttlen))
 	}
 
-	for _, tile := range opts.Tiles {
-		sprites = append(sprites, opts.Sheet.GetSprite(tile[0], tile[1]))
+	for _, tile := range opts.Sheet.Tiles {
+		sprites = append(sprites, opts.Sheet.Sheet.GetSprite(tile[0], tile[1]))
 	}
 
-	batch := opts.Sheet.GetBatch()
+	batch := opts.Sheet.Sheet.GetBatch()
 
 	right := pixel.Vec{X: dim, Y: 0}
 
@@ -93,8 +89,8 @@ func NewMap(opts *MapOpts) *Map {
 		rowTypes := make([]int, len(row))
 		gridTypes[y] = rowTypes
 		for x, tileId := range row {
-			rowTypes[x] = opts.TileTypes[tileId]
-			sprites[tileId].Draw(batch, opts.Sheet.IM().Moved(place))
+			rowTypes[x] = opts.Sheet.TileTypes[tileId]
+			sprites[tileId].Draw(batch, opts.Sheet.Sheet.IM().Moved(place))
 			place = place.Add(right)
 		}
 	}
