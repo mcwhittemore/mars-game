@@ -12,10 +12,13 @@ import (
 )
 
 func run() {
+	mon := pixelgl.PrimaryMonitor()
+	w, h := mon.Size()
 	cfg := pixelgl.WindowConfig{
-		Title:  "Mars Game!",
-		Bounds: pixel.R(0, 0, 608, 608),
-		VSync:  true,
+		Title:     "Mars Game!",
+		Bounds:    pixel.R(0, 0, w, h),
+		Resizable: true,
+		VSync:     true,
 	}
 
 	win, err := pixelgl.NewWindow(cfg)
