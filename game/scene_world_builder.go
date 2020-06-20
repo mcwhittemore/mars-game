@@ -30,8 +30,6 @@ type WorldBuilder struct {
 
 func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 
-	dim := float64(64)
-
 	if g.mode == "input" {
 		g.inputMode(mi)
 	} else if g.mode == "normal" {
@@ -44,7 +42,7 @@ func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 		g.removeMode(mi)
 	}
 
-	mi.KeepInView(g.Pos.Scaled(dim), 128)
+	mi.KeepInView(g.Pos.Scaled(sheet.TileSize), 128)
 
 	imd := imdraw.New(nil)
 
@@ -56,16 +54,16 @@ func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 		imd.Color = pixel.RGB(0, 1, 0)
 	}
 
-	pos := g.Pos.Scaled(dim).Sub(pixel.V(dim/2, dim/2))
+	pos := g.Pos.Scaled(sheet.TileSize).Sub(pixel.V(sheet.TileSize/2, sheet.TileSize/2))
 	abt := fmt.Sprintf("x: %d/%d\ny: %d/%d", int(g.Pos.X), len(g.MapOpts.Grid[0]), int(g.Pos.Y), len(g.MapOpts.Grid))
-	mi.AddText(fonts.NewText(abt, pos.Add(pixel.V(0, dim*.8))))
-	imd.Push(pos, pos.Add(pixel.V(dim, dim)))
+	mi.AddText(fonts.NewText(abt, pos.Add(pixel.V(0, sheet.TileSize*.8))))
+	imd.Push(pos, pos.Add(pixel.V(sheet.TileSize, sheet.TileSize)))
 	imd.Rectangle(2)
 
 	imd.Color = pixel.RGB(1, 1, 0)
 	for name, loc := range g.MapOpts.Locations {
-		lMin := loc.Min.Scaled(dim).Sub(pixel.V(dim/2, dim/2))
-		lMax := loc.Max.Scaled(dim).Sub(pixel.V(dim/2, dim/2))
+		lMin := loc.Min.Scaled(sheet.TileSize).Sub(pixel.V(sheet.TileSize/2, sheet.TileSize/2))
+		lMax := loc.Max.Scaled(sheet.TileSize).Sub(pixel.V(sheet.TileSize/2, sheet.TileSize/2))
 
 		txt := fonts.NewText(name, lMin.Add(pixel.V(2, 2)))
 		mi.AddText(txt)
@@ -104,7 +102,7 @@ func (g *WorldBuilder) newLocationMode(mi characters.MindInput) {
 		}
 		g.mode = "location"
 	} else {
-		pos := g.Pos.Scaled(64).Sub(pixel.V(32, 32))
+		pos := g.Pos.Scaled(sheet.TileSize).Sub(pixel.V(sheet.TileSize/2, sheet.TileSize/2))
 		mi.AddText(fonts.NewText(g.locationName, pos.Add(pixel.V(2, 2))))
 	}
 }
@@ -171,7 +169,7 @@ func (g *WorldBuilder) locationMode(mi characters.MindInput) {
 
 func (g *WorldBuilder) removeMode(mi characters.MindInput) {
 	if mi.JustPressed(pixelgl.KeyL) {
-		pos := g.Pos.Scaled(64)
+		pos := g.Pos.Scaled(sheet.TileSize)
 		loc, _ := g.Ground.GetLocationAt(pos)
 		delete(g.MapOpts.Locations, loc)
 		g.Ground = maps.NewMap(g.MapOpts)
@@ -261,7 +259,7 @@ func (g *WorldBuilder) setMinMax() {
 	}
 
 	if g.Pos.X < 0 {
-		g.cam = g.cam.Add(pixel.V(64, 0))
+		g.cam = g.cam.Add(pixel.V(sheet.TileSize, 0))
 		g.Pos.X = 0
 		g.addCol(false)
 	}
@@ -273,7 +271,7 @@ func (g *WorldBuilder) setMinMax() {
 	}
 
 	if g.Pos.Y < 0 {
-		g.cam = g.cam.Add(pixel.V(0, 64))
+		g.cam = g.cam.Add(pixel.V(0, sheet.TileSize))
 		g.Pos.Y = 0
 		g.addRow(true)
 	}

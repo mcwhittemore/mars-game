@@ -2,6 +2,7 @@ package characters
 
 import (
 	"app/items"
+	"app/sheet"
 
 	"fmt"
 	"time"
@@ -25,7 +26,7 @@ func NewHeroDefault(pos pixel.Vec) *Character {
 			c.ChangePose("up")
 		} else if mi.JustPressed(pixelgl.KeyJ) {
 			dir := c.GetDirection()
-			tp := c.Pos.Add(dir.Scaled(64))
+			tp := c.Pos.Add(dir.Scaled(sheet.TileSize))
 			fmt.Println(dir, tp)
 			item := mi.GetItem(tp)
 			myItem := items.PickUpItem(item)
@@ -35,7 +36,7 @@ func NewHeroDefault(pos pixel.Vec) *Character {
 			}
 		} else if mi.JustPressed(pixelgl.KeyK) && cd.InHands != "" {
 			dir := c.GetDirection()
-			tp := c.Pos.Add(dir.Scaled(64))
+			tp := c.Pos.Add(dir.Scaled(sheet.TileSize))
 			item := items.DropItem(cd.InHands, tp)
 			mi.AddItem(item)
 			cd.RemoveItem(cd.InHands)

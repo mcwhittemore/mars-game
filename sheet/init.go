@@ -6,8 +6,10 @@ import (
 
 var GroundTileSheet *TileSheet
 
+const TileSize = float64(48)
+
 func init() {
-	groundSheet, err := NewSheet("crater.png", pixel.Vec{X: 20, Y: 20}, pixel.ZV, 64)
+	groundSheet, err := NewSheet("crater.png", pixel.Vec{X: 20, Y: 20}, pixel.ZV, TileSize)
 	if err != nil {
 		panic(err)
 	}
