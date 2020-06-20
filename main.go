@@ -15,7 +15,7 @@ func run() {
 	mon := pixelgl.PrimaryMonitor()
 	w, h := mon.Size()
 	cfg := pixelgl.WindowConfig{
-		Title:     "Mars Game!",
+		Title:     "Mars Base One",
 		Bounds:    pixel.R(0, 0, w, h),
 		Resizable: true,
 		VSync:     true,
