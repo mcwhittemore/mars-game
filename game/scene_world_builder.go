@@ -3,6 +3,7 @@ package game
 import (
 	"app/characters"
 	"app/fonts"
+	"app/items"
 	"app/maps"
 	"app/sheet"
 
@@ -17,15 +18,17 @@ import (
 )
 
 type WorldBuilder struct {
-	mode         string
-	cam          pixel.Vec
-	MapOpts      *maps.MapOpts
-	Ground       *maps.Map
-	TileSheet    *sheet.TileSheet
-	Pos          pixel.Vec
-	TileId       int
-	path         string
-	locationName string
+	mode          string
+	cam           pixel.Vec
+	MapOpts       *maps.MapOpts
+	Ground        *maps.Map
+	TileSheet     *sheet.TileSheet
+	Pos           pixel.Vec
+	TileId        int
+	path          string
+	locationName  string
+	buildingNames []string
+	buildingIdx   int
 }
 
 func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
@@ -40,6 +43,8 @@ func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 		g.newLocationMode(mi)
 	} else if g.mode == "remove" {
 		g.removeMode(mi)
+	} else if g.mode == "building" {
+		g.buildingMode(mi)
 	}
 
 	mi.KeepInView(g.Pos.Scaled(sheet.TileSize), 128)
@@ -72,6 +77,67 @@ func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 	}
 
 	mi.AddDraw(imd)
+}
+
+func (g *WorldBuilder) removeBuilding(mi characters.MindInput) {
+	pos := g.Pos.Scaled(sheet.TileSize)
+	item := mi.GetItem(pos)
+	if item != nil {
+		mi.RemoveItem(item)
+	}
+}
+
+func (g *WorldBuilder) addBuilding(mi characters.MindInput) {
+	g.removeBuilding(mi)
+	name := g.buildingNames[g.buildingIdx]
+	pos := g.Pos.Scaled(sheet.TileSize)
+	item := items.NewItem(name, pos, nil)
+	mi.AddItem(item)
+}
+
+func (g *WorldBuilder) buildingMode(mi characters.MindInput) {
+	moveUpdate := false
+	pos := g.Pos
+	if mi.JustPressed(pixelgl.KeyEscape) {
+		g.mode = "normal"
+	} else if mi.JustPressed(pixelgl.KeyA) {
+		pos = g.Pos.Add(pixel.V(-1, 0))
+		moveUpdate = true
+	} else if mi.JustPressed(pixelgl.KeyW) {
+		pos = g.Pos.Add(pixel.V(0, 1))
+		moveUpdate = true
+	} else if mi.JustPressed(pixelgl.KeyD) {
+		pos = g.Pos.Add(pixel.V(1, 0))
+		moveUpdate = true
+	} else if mi.JustPressed(pixelgl.KeyS) {
+		pos = g.Pos.Add(pixel.V(0, -1))
+		moveUpdate = true
+	} else if mi.JustPressed(pixelgl.KeyEnter) {
+		g.addBuilding(mi)
+	} else if mi.JustPressed(pixelgl.KeyJ) {
+		g.buildingIdx++
+		if g.buildingIdx == len(g.buildingNames) {
+			g.buildingIdx = 0
+		}
+		g.addBuilding(mi)
+	} else if mi.JustPressed(pixelgl.KeyK) {
+		g.buildingIdx--
+		if g.buildingIdx == -1 {
+			g.buildingIdx = len(g.buildingNames) - 1
+		}
+		g.addBuilding(mi)
+	} else if mi.JustPressed(pixelgl.KeyDelete) {
+		g.removeBuilding(mi)
+	}
+
+	if moveUpdate {
+		maxX := len(g.MapOpts.Grid[0])
+		maxY := len(g.MapOpts.Grid)
+
+		if pos.X >= 0 && int(pos.X) < maxX && pos.Y >= 0 && int(pos.Y) < maxY {
+			g.Pos = pos
+		}
+	}
 }
 
 func (g *WorldBuilder) newLocationMode(mi characters.MindInput) {
@@ -196,6 +262,8 @@ func (g *WorldBuilder) normalMode(mi characters.MindInput) {
 		g.mode = "new-location"
 	} else if mi.JustPressed(pixelgl.KeyR) {
 		g.mode = "remove"
+	} else if mi.JustPressed(pixelgl.KeyB) {
+		g.mode = "building"
 	}
 
 	maxX := len(g.MapOpts.Grid[0])
@@ -308,17 +376,20 @@ func NewWorldBuilder() Scene {
 		},
 	}
 
+	buildingNames := items.GetClassNames("Cinder Block")
+
 	mapOne := maps.NewMap(opts)
 
 	return &WorldBuilder{
-		mode:      "normal",
-		Ground:    mapOne,
-		MapOpts:   opts,
-		TileSheet: sheet.GetTileSheet(opts.Sheet),
-		cam:       pixel.V(0, 0),
-		Pos:       pixel.V(0, 0),
-		TileId:    0,
-		path:      "",
+		mode:          "normal",
+		Ground:        mapOne,
+		MapOpts:       opts,
+		TileSheet:     sheet.GetTileSheet(opts.Sheet),
+		cam:           pixel.V(0, 0),
+		Pos:           pixel.V(0, 0),
+		TileId:        0,
+		path:          "",
+		buildingNames: buildingNames,
 	}
 }
 

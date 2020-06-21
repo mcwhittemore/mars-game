@@ -55,6 +55,7 @@ const (
 	Seed ItemType = iota
 	Plant
 	Crop
+	Structure
 )
 
 var itemsDB = make(map[int]Item)
@@ -63,10 +64,13 @@ var itemIdxByName = make(map[string]int)
 
 func init() {
 
-	cropSheet, err := sheet.NewSheet("crops.png", pixel.Vec{X: 16, Y: 16}, pixel.Vec{X: 0, Y: 0}, 32)
+	cropSheet, err := sheet.NewSheet("crops.png", pixel.Vec{X: 16, Y: 16}, pixel.ZV, sheet.TileSize/2)
+
 	if err != nil {
 		panic(err)
 	}
+
+	wallSheet, err := sheet.NewSheet("walls.png", pixel.Vec{X: 32, Y: 32}, pixel.ZV, sheet.TileSize)
 
 	itemsDB[0] = Item{
 		Type:  Seed,
@@ -74,8 +78,6 @@ func init() {
 		Class: "Corn",
 		Sheet: cropSheet,
 		Icon:  [2]float64{5, 0},
-		Mind:  nil,
-		Pos:   pixel.ZV,
 	}
 
 	itemsDB[1] = Item{
@@ -84,8 +86,6 @@ func init() {
 		Class: "Corn",
 		Sheet: cropSheet,
 		Icon:  [2]float64{4, 0},
-		Mind:  nil,
-		Pos:   pixel.ZV,
 	}
 
 	itemsDB[2] = Item{
@@ -94,13 +94,103 @@ func init() {
 		Class: "Corn",
 		Sheet: cropSheet,
 		Icon:  [2]float64{0, 0},
-		Mind:  nil,
-		Pos:   pixel.ZV,
+	}
+
+	itemsDB[3] = Item{
+		Type:  Structure,
+		Name:  "Cinder Block 001",
+		Class: "Cinder Block",
+		Sheet: wallSheet,
+		Icon:  [2]float64{0, 3},
+	}
+
+	itemsDB[4] = Item{
+		Type:  Structure,
+		Name:  "Cinder Block 002",
+		Class: "Cinder Block",
+		Sheet: wallSheet,
+		Icon:  [2]float64{1, 3},
+	}
+
+	itemsDB[5] = Item{
+		Type:  Structure,
+		Name:  "Cinder Block 003",
+		Class: "Cinder Block",
+		Sheet: wallSheet,
+		Icon:  [2]float64{2, 3},
+	}
+
+	itemsDB[6] = Item{
+		Type:  Structure,
+		Name:  "Cinder Block 004",
+		Class: "Cinder Block",
+		Sheet: wallSheet,
+		Icon:  [2]float64{0, 2},
+	}
+
+	itemsDB[7] = Item{
+		Type:  Structure,
+		Name:  "Cinder Block 005",
+		Class: "Cinder Block",
+		Sheet: wallSheet,
+		Icon:  [2]float64{1, 2},
+	}
+
+	itemsDB[8] = Item{
+		Type:  Structure,
+		Name:  "Cinder Block 006",
+		Class: "Cinder Block",
+		Sheet: wallSheet,
+		Icon:  [2]float64{2, 2},
+	}
+
+	itemsDB[9] = Item{
+		Type:  Structure,
+		Name:  "Cinder Block 006",
+		Class: "Cinder Block",
+		Sheet: wallSheet,
+		Icon:  [2]float64{0, 1},
+	}
+
+	itemsDB[10] = Item{
+		Type:  Structure,
+		Name:  "Cinder Block 008",
+		Class: "Cinder Block",
+		Sheet: wallSheet,
+		Icon:  [2]float64{1, 1},
+	}
+
+	itemsDB[11] = Item{
+		Type:  Structure,
+		Name:  "Cinder Block 009",
+		Class: "Cinder Block",
+		Sheet: wallSheet,
+		Icon:  [2]float64{2, 1},
+	}
+
+	itemsDB[12] = Item{
+		Type:  Structure,
+		Name:  "Cinder Block 010",
+		Class: "Cinder Block",
+		Sheet: wallSheet,
+		Icon:  [2]float64{0, 0},
 	}
 
 	for i, item := range itemsDB {
 		itemIdxByName[item.Name] = i
 	}
+}
+
+func GetClassNames(class string) []string {
+	names := make([]string, 0)
+
+	for _, item := range itemsDB {
+		if item.Class == class {
+			names = append(names, item.Name)
+		}
+	}
+
+	return names
 }
 
 func DropItem(name string, pos pixel.Vec) *Item {
