@@ -27,6 +27,7 @@ type MindInput interface {
 	RemoveItem(*items.Item)
 	ListItems() []*items.Item
 	AddDraw(*imdraw.IMDraw)
+	GetLocation(string) pixel.Rect
 	AddText(*text.Text)
 }
 

@@ -1,5 +1,5 @@
 files:
-	node data/build.js ./crater.png ./crops.png ./characters.png ./maps/base.json ./mars-base.png ./walls.png ./items/base-structure.json
+	node data/build.js ./*.png ./maps/*.json ./items/*.json
 
 run: files
 	go run main.go

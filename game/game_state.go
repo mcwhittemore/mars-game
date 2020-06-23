@@ -176,6 +176,11 @@ func (gs *GameState) ChangeScene(name string) {
 	gs.sceneManager.ChangeScene(name, gs)
 }
 
+func (gs *GameState) GetLocation(name string) pixel.Rect {
+	am := gs.sceneManager.Current.GetMap()
+	return am.Locations[name]
+}
+
 func (gs *GameState) GetCollideRect(rect pixel.Rect, thing interface{}) (pixel.Rect, *characters.Character) {
 	var out pixel.Rect
 

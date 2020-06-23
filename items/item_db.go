@@ -68,6 +68,7 @@ type ItemSheet int
 const (
 	Crop_Sheet ItemSheet = iota
 	Wall_Sheet
+	Conveyor_Sheet
 )
 
 var itemsDB = make(map[int]Item)
@@ -90,6 +91,12 @@ func init() {
 		panic(err)
 	}
 	ItemSheets = append(ItemSheets, wallSheet)
+
+	conveyorSheet, err := sheet.NewSheet("conveyorbelt.png", pixel.Vec{X: 32, Y: 32}, pixel.ZV, sheet.TileSize)
+	if err != nil {
+		panic(err)
+	}
+	ItemSheets = append(ItemSheets, conveyorSheet)
 
 	itemsDB[0] = Item{
 		Type:  Seed_Type,
@@ -115,18 +122,23 @@ func init() {
 		Icon:  [2]float64{0, 0},
 	}
 
-	addItems(3, 3, Wall_Sheet, Structure_Type, "Cinder Block", "Cinder Block %d")
+	addItems(3, 3, 2, Wall_Sheet, Structure_Type, "Cinder Block", "Cinder Block %d")
+
+	addItems(4, 1, 0, Conveyor_Sheet, Structure_Type, "Conveyor Belt", "Conveyor Belt %d")
 
 	for i, item := range itemsDB {
 		itemIdxByName[item.Name] = i
 	}
 }
 
-func addItems(rows, cols float64, sheet ItemSheet, t ItemType, class string, nameF string) {
+func addItems(rows, cols, offset float64, sheet ItemSheet, t ItemType, class string, nameF string) {
 	s := len(itemsDB)
 	i := 0
 	for x := float64(0); x < cols; x++ {
 		for y := float64(0); y < rows; y++ {
+			if y == 0 && x > cols-offset {
+				continue
+			}
 			itemsDB[s+i] = Item{
 				Type:  t,
 				Name:  fmt.Sprintf(nameF, i),
