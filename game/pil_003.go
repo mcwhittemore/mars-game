@@ -33,7 +33,7 @@ func (g *PIL003) Enter(mi characters.MindInput) {
 		hero.AddItem("Corn Seed")
 	}
 
-	mi.AddItem(items.NewItem("Corn Plant", pixel.V(664, 700), items.NewMindCropGrow()))
+	mi.AddItem(items.NewItem("Corn Plant", pixel.V(664, 700), "crop-grow"))
 }
 
 func (g *PIL003) Exit(mi characters.MindInput) {

@@ -14,12 +14,12 @@ type Item struct {
 	Name  string
 	Sheet ItemSheet
 	Icon  [2]float64
-	Mind  MindFunc `json:"-"`
+	State ItemState
 	Pos   pixel.Vec
 }
 
 func (item *Item) CanPickUp() bool {
-	if item.Type == Plant_Type && item.Mind != nil {
+	if item.Type == Plant_Type && !item.State.UsingController("") {
 		return false
 	}
 	return true
@@ -45,11 +45,14 @@ func (item *Item) PosBounds(pos pixel.Vec) pixel.Rect {
 	return pixel.R(pos.X-w, pos.Y-h, pos.X+w, pos.Y+h)
 }
 
-func NewItem(name string, pos pixel.Vec, mind MindFunc) *Item {
+func NewItem(name string, pos pixel.Vec, controller string) *Item {
 	idx := itemIdxByName[name]
 	item := itemsDB[idx]
 	item.Pos = pos
-	item.Mind = mind
+	item.State = ItemState{
+		controller: controller,
+		Data:       make(map[string]float64),
+	}
 
 	return &item
 }
@@ -167,7 +170,7 @@ func DropItem(name string, pos pixel.Vec) *Item {
 	item := itemsDB[itemIdxByName[name]]
 	if item.Type == Seed_Type {
 		item = itemsDB[itemIdxByName[fmt.Sprintf("%s Plant", item.Class)]]
-		item.Mind = NewMindCropGrow()
+		item.State.ChangeController("crop-grow")
 	}
 	item.Pos = pos
 	return &item

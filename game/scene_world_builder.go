@@ -92,7 +92,7 @@ func (g *WorldBuilder) addBuilding(mi characters.MindInput) {
 	g.removeBuilding(mi)
 	name := g.buildingNames[g.buildingIdx]
 	pos := g.Pos.Scaled(sheet.TileSize)
-	item := items.NewItem(name, pos, nil)
+	item := items.NewItem(name, pos, "")
 	mi.AddItem(item)
 }
 

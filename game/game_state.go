@@ -43,10 +43,7 @@ func (gs *GameState) Update(dt float64) {
 	}
 
 	for _, item := range gs.items {
-		if item.Mind == nil {
-			continue
-		}
-		item.Mind(item, dt, gs)
+		item.State.Update(item, dt, gs)
 	}
 
 	gs.sceneManager.Current.Update(dt, gs)

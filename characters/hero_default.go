@@ -4,7 +4,6 @@ import (
 	"app/items"
 	"app/sheet"
 
-	"fmt"
 	"time"
 
 	"github.com/faiface/pixel"
@@ -27,7 +26,6 @@ func NewHeroDefault(pos pixel.Vec) *Character {
 		} else if mi.JustPressed(pixelgl.KeyJ) {
 			dir := c.GetDirection()
 			tp := c.Pos.Add(dir.Scaled(sheet.TileSize))
-			fmt.Println(dir, tp)
 			item := mi.GetItem(tp)
 			myItem := items.PickUpItem(item)
 			if myItem != "" {
