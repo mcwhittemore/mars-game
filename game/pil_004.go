@@ -2,7 +2,12 @@ package game
 
 import (
 	"app/characters"
+	"app/data"
+	"app/items"
 	"app/maps"
+
+	"encoding/json"
+	"io/ioutil"
 
 	"github.com/faiface/pixel"
 )
@@ -26,6 +31,23 @@ func (g *PIL004) SetCamera(cam pixel.Vec) {
 
 func (g *PIL004) Enter(mi characters.MindInput) {
 	mi.ShowCharacter("hero", characters.NewHeroDefault(pixel.V(500, 600)))
+
+	file, err := data.Open("/items/base-structure.json")
+	items := make([]*items.Item, 0)
+
+	b, err := ioutil.ReadAll(file)
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal(b, &items)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, item := range items {
+		mi.AddItem(item)
+	}
 }
 
 func (g *PIL004) Exit(mi characters.MindInput) {

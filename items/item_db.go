@@ -12,26 +12,31 @@ type Item struct {
 	Type  ItemType
 	Class string
 	Name  string
-	Sheet *sheet.Sheet
+	Sheet ItemSheet
 	Icon  [2]float64
-	Mind  MindFunc
+	Mind  MindFunc `json:"-"`
 	Pos   pixel.Vec
 }
 
 func (item *Item) CanPickUp() bool {
-	if item.Type == Plant && item.Mind != nil {
+	if item.Type == Plant_Type && item.Mind != nil {
 		return false
 	}
 	return true
 }
 
-func (item *Item) GetSprite() *pixel.Sprite {
-	return item.Sheet.GetSprite(item.Icon[0], item.Icon[1])
+func GetSheet(id ItemSheet) *sheet.Sheet {
+	return ItemSheets[id]
+}
+
+func (item *Item) GetSprite() (*pixel.Sprite, pixel.Matrix) {
+	sheet := ItemSheets[item.Sheet]
+	return sheet.GetSprite(item.Icon[0], item.Icon[1]), sheet.IM()
 }
 
 func (item *Item) PosBounds(pos pixel.Vec) pixel.Rect {
-	im := item.Sheet.IM()
-	bds := item.GetSprite().Frame()
+	sprite, im := item.GetSprite()
+	bds := sprite.Frame()
 	bds.Min = im.Project(bds.Min)
 	bds.Max = im.Project(bds.Max)
 	w := (bds.Max.X - bds.Min.X) / 2
@@ -52,132 +57,85 @@ func NewItem(name string, pos pixel.Vec, mind MindFunc) *Item {
 type ItemType int
 
 const (
-	Seed ItemType = iota
-	Plant
-	Crop
-	Structure
+	Seed_Type ItemType = iota
+	Plant_Type
+	Crop_Type
+	Structure_Type
+)
+
+type ItemSheet int
+
+const (
+	Crop_Sheet ItemSheet = iota
+	Wall_Sheet
 )
 
 var itemsDB = make(map[int]Item)
-var cropSheet sheet.Sheet
 var itemIdxByName = make(map[string]int)
+
+var cropSheet sheet.Sheet
+
+var ItemSheets = make([]*sheet.Sheet, 0)
 
 func init() {
 
 	cropSheet, err := sheet.NewSheet("crops.png", pixel.Vec{X: 16, Y: 16}, pixel.ZV, sheet.TileSize/2)
-
 	if err != nil {
 		panic(err)
 	}
+	ItemSheets = append(ItemSheets, cropSheet)
 
 	wallSheet, err := sheet.NewSheet("walls.png", pixel.Vec{X: 32, Y: 32}, pixel.ZV, sheet.TileSize)
+	if err != nil {
+		panic(err)
+	}
+	ItemSheets = append(ItemSheets, wallSheet)
 
 	itemsDB[0] = Item{
-		Type:  Seed,
+		Type:  Seed_Type,
 		Name:  "Corn Seed",
 		Class: "Corn",
-		Sheet: cropSheet,
+		Sheet: Crop_Sheet,
 		Icon:  [2]float64{5, 0},
 	}
 
 	itemsDB[1] = Item{
-		Type:  Plant,
+		Type:  Plant_Type,
 		Name:  "Corn Plant",
 		Class: "Corn",
-		Sheet: cropSheet,
+		Sheet: Crop_Sheet,
 		Icon:  [2]float64{4, 0},
 	}
 
 	itemsDB[2] = Item{
-		Type:  Crop,
+		Type:  Crop_Type,
 		Name:  "Corn",
 		Class: "Corn",
-		Sheet: cropSheet,
+		Sheet: Crop_Sheet,
 		Icon:  [2]float64{0, 0},
 	}
 
-	itemsDB[3] = Item{
-		Type:  Structure,
-		Name:  "Cinder Block 001",
-		Class: "Cinder Block",
-		Sheet: wallSheet,
-		Icon:  [2]float64{0, 3},
-	}
-
-	itemsDB[4] = Item{
-		Type:  Structure,
-		Name:  "Cinder Block 002",
-		Class: "Cinder Block",
-		Sheet: wallSheet,
-		Icon:  [2]float64{1, 3},
-	}
-
-	itemsDB[5] = Item{
-		Type:  Structure,
-		Name:  "Cinder Block 003",
-		Class: "Cinder Block",
-		Sheet: wallSheet,
-		Icon:  [2]float64{2, 3},
-	}
-
-	itemsDB[6] = Item{
-		Type:  Structure,
-		Name:  "Cinder Block 004",
-		Class: "Cinder Block",
-		Sheet: wallSheet,
-		Icon:  [2]float64{0, 2},
-	}
-
-	itemsDB[7] = Item{
-		Type:  Structure,
-		Name:  "Cinder Block 005",
-		Class: "Cinder Block",
-		Sheet: wallSheet,
-		Icon:  [2]float64{1, 2},
-	}
-
-	itemsDB[8] = Item{
-		Type:  Structure,
-		Name:  "Cinder Block 006",
-		Class: "Cinder Block",
-		Sheet: wallSheet,
-		Icon:  [2]float64{2, 2},
-	}
-
-	itemsDB[9] = Item{
-		Type:  Structure,
-		Name:  "Cinder Block 006",
-		Class: "Cinder Block",
-		Sheet: wallSheet,
-		Icon:  [2]float64{0, 1},
-	}
-
-	itemsDB[10] = Item{
-		Type:  Structure,
-		Name:  "Cinder Block 008",
-		Class: "Cinder Block",
-		Sheet: wallSheet,
-		Icon:  [2]float64{1, 1},
-	}
-
-	itemsDB[11] = Item{
-		Type:  Structure,
-		Name:  "Cinder Block 009",
-		Class: "Cinder Block",
-		Sheet: wallSheet,
-		Icon:  [2]float64{2, 1},
-	}
-
-	itemsDB[12] = Item{
-		Type:  Structure,
-		Name:  "Cinder Block 010",
-		Class: "Cinder Block",
-		Sheet: wallSheet,
-		Icon:  [2]float64{0, 0},
-	}
+	addItems(3, 3, Wall_Sheet, Structure_Type, "Cinder Block", "Cinder Block %d")
 
 	for i, item := range itemsDB {
 		itemIdxByName[item.Name] = i
+	}
+}
+
+func addItems(rows, cols float64, sheet ItemSheet, t ItemType, class string, nameF string) {
+	s := len(itemsDB)
+	i := 0
+	for x := float64(0); x < cols; x++ {
+		for y := float64(0); y < rows; y++ {
+			itemsDB[s+i] = Item{
+				Type:  t,
+				Name:  fmt.Sprintf(nameF, i),
+				Class: class,
+				Sheet: sheet,
+				Icon:  [2]float64{x, y},
+			}
+			i++
+		}
 	}
 }
 
@@ -195,7 +153,7 @@ func GetClassNames(class string) []string {
 
 func DropItem(name string, pos pixel.Vec) *Item {
 	item := itemsDB[itemIdxByName[name]]
-	if item.Type == Seed {
+	if item.Type == Seed_Type {
 		item = itemsDB[itemIdxByName[fmt.Sprintf("%s Plant", item.Class)]]
 		item.Mind = NewMindCropGrow()
 	}
@@ -208,7 +166,7 @@ func PickUpItem(item *Item) string {
 		return ""
 	}
 
-	if item.Type == Plant {
+	if item.Type == Plant_Type {
 		return item.Class
 	} else {
 		return item.Name

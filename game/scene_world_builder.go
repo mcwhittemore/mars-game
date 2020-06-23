@@ -26,6 +26,7 @@ type WorldBuilder struct {
 	Pos           pixel.Vec
 	TileId        int
 	path          string
+	structurePath string
 	locationName  string
 	buildingNames []string
 	buildingIdx   int
@@ -100,6 +101,7 @@ func (g *WorldBuilder) buildingMode(mi characters.MindInput) {
 	pos := g.Pos
 	if mi.JustPressed(pixelgl.KeyEscape) {
 		g.mode = "normal"
+		g.save(mi)
 	} else if mi.JustPressed(pixelgl.KeyA) {
 		pos = g.Pos.Add(pixel.V(-1, 0))
 		moveUpdate = true
@@ -126,7 +128,7 @@ func (g *WorldBuilder) buildingMode(mi characters.MindInput) {
 			g.buildingIdx = len(g.buildingNames) - 1
 		}
 		g.addBuilding(mi)
-	} else if mi.JustPressed(pixelgl.KeyDelete) {
+	} else if mi.JustPressed(pixelgl.KeyDelete) || mi.JustPressed(pixelgl.KeyBackspace) {
 		g.removeBuilding(mi)
 	}
 
@@ -197,7 +199,7 @@ func (g *WorldBuilder) locationMode(mi characters.MindInput) {
 		g.mode = "normal"
 		g.Ground = maps.NewMap(g.MapOpts)
 		g.locationName = ""
-		g.save()
+		g.save(mi)
 		return
 	}
 
@@ -239,7 +241,7 @@ func (g *WorldBuilder) removeMode(mi characters.MindInput) {
 		loc, _ := g.Ground.GetLocationAt(pos)
 		delete(g.MapOpts.Locations, loc)
 		g.Ground = maps.NewMap(g.MapOpts)
-		g.save()
+		g.save(mi)
 		g.mode = "normal"
 	} else if mi.JustPressed(pixelgl.KeyEscape) {
 		g.mode = "normal"
@@ -279,7 +281,7 @@ func (g *WorldBuilder) inputMode(mi characters.MindInput) {
 
 	if mi.JustPressed(pixelgl.KeyEscape) {
 		g.mode = "normal"
-		g.save()
+		g.save(mi)
 	} else if mi.JustPressed(pixelgl.KeyJ) {
 		needsNewMap = true
 		g.TileId++
@@ -389,6 +391,7 @@ func NewWorldBuilder() Scene {
 		Pos:           pixel.V(0, 0),
 		TileId:        0,
 		path:          "",
+		structurePath: "",
 		buildingNames: buildingNames,
 	}
 }
@@ -405,7 +408,7 @@ func (g *WorldBuilder) SetCamera(cam pixel.Vec) {
 	g.cam = cam
 }
 
-func (g *WorldBuilder) save() {
+func (g *WorldBuilder) save(mi characters.MindInput) {
 	b, err := json.Marshal(g.MapOpts)
 	if err != nil {
 		panic(err)
@@ -414,12 +417,27 @@ func (g *WorldBuilder) save() {
 	if err != nil {
 		panic(err)
 	}
+
+	items := mi.ListItems()
+	b, err = json.Marshal(items)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ioutil.WriteFile(g.structurePath, b, 0644)
+	if err != nil {
+		panic(err)
+	}
+
 }
 
 func (g *WorldBuilder) Enter(mi characters.MindInput) {
 	g.path = os.Args[2]
+	g.structurePath = os.Args[3]
+
 	file, err := ioutil.ReadFile(g.path)
 	sheet := g.MapOpts.Sheet
+
 	if err == nil {
 		err = json.Unmarshal(file, g.MapOpts)
 		if err != nil {
@@ -431,6 +449,20 @@ func (g *WorldBuilder) Enter(mi characters.MindInput) {
 		}
 		g.Ground = maps.NewMap(g.MapOpts)
 	}
+
+	file, err = ioutil.ReadFile(g.structurePath)
+	if err == nil {
+		items := make([]*items.Item, 0)
+		err = json.Unmarshal(file, &items)
+		if err != nil {
+			panic(err)
+		}
+
+		for _, item := range items {
+			mi.AddItem(item)
+		}
+	}
+
 }
 
 func (g *WorldBuilder) Exit(mi characters.MindInput) {

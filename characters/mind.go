@@ -25,6 +25,7 @@ type MindInput interface {
 	AddItem(*items.Item)
 	GetItem(pixel.Vec) *items.Item
 	RemoveItem(*items.Item)
+	ListItems() []*items.Item
 	AddDraw(*imdraw.IMDraw)
 	AddText(*text.Text)
 }

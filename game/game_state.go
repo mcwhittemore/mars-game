@@ -60,11 +60,19 @@ func (gs *GameState) Render(win *pixelgl.Window) {
 	activeMap := gs.sceneManager.Current.GetMap()
 	activeMap.Render.Draw(win)
 
+	wallsBatch := items.ItemSheets[items.Wall_Sheet].GetBatch()
+	//wallsBatch := pixel.NewBatch(&pixel.TrianglesData{}, items.GetSheet(items.Wall_Sheet))
 	for _, item := range gs.items {
-		sprite := item.GetSprite()
-		matrix := item.Sheet.IM()
-		sprite.Draw(win, matrix.Moved(item.Pos))
+		sprite, im := item.GetSprite()
+		matrix := im.Moved(item.Pos)
+
+		if item.Sheet == items.Wall_Sheet {
+			sprite.Draw(wallsBatch, matrix)
+		} else {
+			sprite.Draw(win, matrix)
+		}
 	}
+	wallsBatch.Draw(win)
 
 	for _, cd := range gs.characters {
 		cd.Render(win)
@@ -126,6 +134,10 @@ func (gs *GameState) RemoveItem(t *items.Item) {
 			return
 		}
 	}
+}
+
+func (gs *GameState) ListItems() []*items.Item {
+	return gs.items
 }
 
 func (gs *GameState) ShowCharacter(name string, c *characters.Character) {
