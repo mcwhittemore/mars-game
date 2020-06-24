@@ -21,8 +21,8 @@ func (is *ItemState) Update(item *Item, dt float64, mi MindInput) {
 		ns := CropGrow(item, dt, mi)
 		is.Controller = ns.Controller
 		is.Data = ns.Data
-	} else if is.UsingController("x-annimation") {
-		ns := XAnimation(item, dt, mi)
+	} else if is.UsingController("conveyor-belts") {
+		ns := ControlConveyorBelt(item, dt, mi)
 		is.Controller = ns.Controller
 		is.Data = ns.Data
 	}

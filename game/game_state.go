@@ -111,17 +111,15 @@ func (gs *GameState) AddItem(item *items.Item) {
 	gs.items = append(gs.items, item)
 }
 
-func (gs *GameState) GetItem(tp pixel.Vec) *items.Item {
-	maxArea := float64(0)
-	var match *items.Item
+func (gs *GameState) GetItems(rect pixel.Rect) []*items.Item {
+	match := make([]*items.Item, 0)
+
 	for _, item := range gs.items {
-		tr := item.PosBounds(tp)
 		ir := item.PosBounds(item.Pos)
 
-		ol := tr.Intersect(ir)
-		if ol.Area() > maxArea {
-			match = item
-			maxArea = ol.Area()
+		ol := rect.Intersect(ir)
+		if ol.Area() > 0 {
+			match = append(match, item)
 		}
 	}
 

@@ -1,6 +1,6 @@
 package items
 
-func XAnimation(item *Item, dt float64, mi MindInput) ItemState {
+func ControlConveyorBelt(item *Item, dt float64, mi MindInput) ItemState {
 	time := mi.GetTime() * 2
 	width := GetSheet(item.Sheet).GetWidth()
 

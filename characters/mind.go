@@ -23,7 +23,7 @@ type MindInput interface {
 	HideCharacter(string)
 	GetCharacter(string) *CharacterData
 	AddItem(*items.Item)
-	GetItem(pixel.Vec) *items.Item
+	GetItems(pixel.Rect) []*items.Item
 	RemoveItem(*items.Item)
 	ListItems() []*items.Item
 	AddDraw(*imdraw.IMDraw)

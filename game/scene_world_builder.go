@@ -82,9 +82,12 @@ func (g *WorldBuilder) Update(dt float64, mi characters.MindInput) {
 
 func (g *WorldBuilder) removeBuilding(mi characters.MindInput) {
 	pos := g.Pos.Scaled(sheet.TileSize)
-	item := mi.GetItem(pos)
-	if item != nil {
-		mi.RemoveItem(item)
+	items := mi.GetItems(pixel.Rect{
+		Min: pos,
+		Max: pos.Add(pixel.V(1, 1)),
+	})
+	if len(items) != 0 {
+		mi.RemoveItem(items[0])
 	}
 }
 

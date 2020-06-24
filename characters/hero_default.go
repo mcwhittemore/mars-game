@@ -26,11 +26,16 @@ func NewHeroDefault(pos pixel.Vec) *Character {
 		} else if mi.JustPressed(pixelgl.KeyJ) {
 			dir := c.GetDirection()
 			tp := c.Pos.Add(dir.Scaled(sheet.TileSize))
-			item := mi.GetItem(tp)
-			myItem := items.PickUpItem(item)
-			if myItem != "" {
-				mi.RemoveItem(item)
-				cd.AddItem(myItem)
+			itemList := mi.GetItems(pixel.Rect{
+				Min: tp,
+				Max: tp.Add(pixel.V(1, 1)),
+			})
+			if len(itemList) > 0 {
+				myItem := items.PickUpItem(itemList[0])
+				if myItem != "" {
+					mi.RemoveItem(itemList[0])
+					cd.AddItem(myItem)
+				}
 			}
 		} else if mi.JustPressed(pixelgl.KeyK) && cd.InHands != "" {
 			dir := c.GetDirection()
