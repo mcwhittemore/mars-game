@@ -25,5 +25,10 @@ func (is *ItemState) Update(item *Item, dt float64, mi MindInput) {
 		ns := ControlConveyorBelt(item, dt, mi)
 		is.Controller = ns.Controller
 		is.Data = ns.Data
+	} else if is.UsingController("spaceship") {
+		ns := ControlSpaceship(item, dt, mi)
+		is.Controller = ns.Controller
+		is.Data = ns.Data
 	}
+
 }

@@ -18,6 +18,7 @@ type MindInput interface {
 	IsObstacle(pixel.Vec) bool
 	GetHeroPos() pixel.Vec
 	AddItem(*Item)
+	GetLocation(string) pixel.Rect
 	GetItems(pixel.Rect, func(*Item) pixel.Rect) []*Item
 	GetTime() float64
 	RemoveItem(*Item)

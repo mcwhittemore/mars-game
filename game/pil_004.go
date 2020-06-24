@@ -5,6 +5,7 @@ import (
 	"app/data"
 	"app/items"
 	"app/maps"
+	"app/sheet"
 
 	"encoding/json"
 	"io/ioutil"
@@ -31,12 +32,11 @@ func (g *PIL004) SetCamera(cam pixel.Vec) {
 
 func (g *PIL004) Enter(mi characters.MindInput) {
 	room := mi.GetLocation("to-earth")
+	lp := mi.GetLocation("landing-pad")
 	mi.ShowCharacter("hero", characters.NewHeroDefault(room.Center()))
 
-	hero := mi.GetCharacter("hero")
-	for i := 0; i < 100; i++ {
-		hero.AddItem("Corn")
-	}
+	mi.AddCharacter("rando-1", nil)
+	mi.ShowCharacter("rando-1", characters.NewRando(92, lp.Center().Add(pixel.V(sheet.TileSize, 0))))
 
 	file, err := data.Open("/items/base-structure.json")
 	items := make([]*items.Item, 0)

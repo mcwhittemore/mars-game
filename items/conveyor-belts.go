@@ -56,6 +56,10 @@ func ControlConveyorBelt(item *Item, dt float64, mi MindInput) ItemState {
 	}
 
 	itemList := mi.GetItems(item.PosBounds(item.Pos), func(t *Item) pixel.Rect {
+		if t.Type == Structure_Type {
+			return pixel.ZR
+		}
+
 		if t == item {
 			return pixel.ZR
 		}

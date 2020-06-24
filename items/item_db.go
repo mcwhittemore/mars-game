@@ -4,6 +4,7 @@ import (
 	"app/sheet"
 
 	"fmt"
+	"strings"
 
 	"github.com/faiface/pixel"
 )
@@ -87,8 +88,6 @@ const (
 var itemsDB = make([]Item, 0)
 var itemIdxByName = make(map[string]int)
 
-var cropSheet sheet.Sheet
-
 var ItemSheets = make([]*sheet.Sheet, 0)
 
 func init() {
@@ -111,7 +110,7 @@ func init() {
 	}
 	ItemSheets = append(ItemSheets, conveyorSheet)
 
-	spaceshipSheet, err := sheet.NewSheet("spaceship.png", pixel.Vec{X: 96, Y: 96}, pixel.ZV, sheet.TileSize*3)
+	spaceshipSheet, err := sheet.NewSheet("spaceship.png", pixel.Vec{X: 96, Y: 96}, pixel.ZV, sheet.TileSize*9)
 	if err != nil {
 		panic(err)
 	}
@@ -163,9 +162,15 @@ func addItems(rows, cols, offset float64, sheet ItemSheet, t ItemType, class str
 			if y == 0 && x > cols-offset {
 				continue
 			}
+
+			name := nameF
+			if strings.Count(nameF, "%d") > 0 {
+				name = fmt.Sprintf(nameF, i)
+			}
+
 			itemsDB = append(itemsDB, Item{
 				Type:  t,
-				Name:  fmt.Sprintf(nameF, i),
+				Name:  name,
 				Class: class,
 				Sheet: sheet,
 				Icon:  [2]float64{x, y},
