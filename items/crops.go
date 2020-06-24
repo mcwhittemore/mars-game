@@ -22,7 +22,7 @@ func CropGrow(item *Item, dt float64, mi MindInput) ItemState {
 	data["stage"] = stage
 
 	return ItemState{
-		controller: controller,
+		Controller: controller,
 		Data:       data,
 	}
 }

@@ -17,6 +17,15 @@ func (s *Sheet) GetDim() float64 {
 	return s.dim
 }
 
+func (s *Sheet) GetWidth() int {
+
+	xMax := s.pic.Bounds().Max.X
+	xMin := s.base.X
+	w := (xMax - xMin) / s.size.X
+
+	return int(w)
+}
+
 func NewSheet(name string, s pixel.Vec, off pixel.Vec, dim float64) (*Sheet, error) {
 	pic, err := loadPicture(name)
 	if err != nil {

@@ -15,5 +15,6 @@ type MindInput interface {
 	GetHeroPos() pixel.Vec
 	AddItem(*Item)
 	GetItem(pixel.Vec) *Item
+	GetTime() float64
 	RemoveItem(*Item)
 }

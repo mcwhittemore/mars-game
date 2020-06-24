@@ -50,7 +50,7 @@ func NewItem(name string, pos pixel.Vec, controller string) *Item {
 	item := itemsDB[idx]
 	item.Pos = pos
 	item.State = ItemState{
-		controller: controller,
+		Controller: controller,
 		Data:       make(map[string]float64),
 	}
 

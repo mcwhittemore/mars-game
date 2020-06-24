@@ -38,6 +38,9 @@ func NewGameState(win *pixelgl.Window) *GameState {
  */
 
 func (gs *GameState) Update(dt float64) {
+
+	gs.gameTime += dt
+
 	for _, cd := range gs.characters {
 		cd.Update(dt, gs)
 	}
@@ -91,6 +94,10 @@ func (gs *GameState) Render(win *pixelgl.Window) {
 /*
  * DATA ACCESS AND STATE CONTROL
  */
+
+func (gs *GameState) GetTime() float64 {
+	return gs.gameTime
+}
 
 func (gs *GameState) AddDraw(imd *imdraw.IMDraw) {
 	gs.draws = append(gs.draws, imd)
