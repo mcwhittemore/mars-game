@@ -29,7 +29,7 @@ func NewHeroDefault(pos pixel.Vec) *Character {
 			itemList := mi.GetItems(pixel.Rect{
 				Min: tp,
 				Max: tp.Add(pixel.V(1, 1)),
-			})
+			}, nil)
 			if len(itemList) > 0 {
 				myItem := items.PickUpItem(itemList[0])
 				if myItem != "" {

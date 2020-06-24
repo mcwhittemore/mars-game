@@ -85,7 +85,7 @@ func (g *WorldBuilder) removeBuilding(mi characters.MindInput) {
 	items := mi.GetItems(pixel.Rect{
 		Min: pos,
 		Max: pos.Add(pixel.V(1, 1)),
-	})
+	}, nil)
 	if len(items) != 0 {
 		mi.RemoveItem(items[0])
 	}

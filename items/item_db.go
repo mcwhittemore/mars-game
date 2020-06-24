@@ -19,9 +19,14 @@ type Item struct {
 }
 
 func (item *Item) CanPickUp() bool {
+	if item.Type == Structure_Type {
+		return false
+	}
+
 	if item.Type == Plant_Type && !item.State.UsingController("") {
 		return false
 	}
+
 	return true
 }
 
@@ -32,6 +37,10 @@ func GetSheet(id ItemSheet) *sheet.Sheet {
 func (item *Item) GetSprite() (*pixel.Sprite, pixel.Matrix) {
 	sheet := ItemSheets[item.Sheet]
 	return sheet.GetSprite(item.Icon[0], item.Icon[1]), sheet.IM()
+}
+
+func (item *Item) SetPos(pos pixel.Vec) {
+	item.Pos = pos
 }
 
 func (item *Item) PosBounds(pos pixel.Vec) pixel.Rect {

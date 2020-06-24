@@ -30,8 +30,13 @@ func (g *PIL004) SetCamera(cam pixel.Vec) {
 }
 
 func (g *PIL004) Enter(mi characters.MindInput) {
-	room := mi.GetLocation("personal-space-1")
+	room := mi.GetLocation("to-earth")
 	mi.ShowCharacter("hero", characters.NewHeroDefault(room.Center()))
+
+	hero := mi.GetCharacter("hero")
+	for i := 0; i < 100; i++ {
+		hero.AddItem("Corn")
+	}
 
 	file, err := data.Open("/items/base-structure.json")
 	items := make([]*items.Item, 0)
@@ -63,7 +68,7 @@ func (g *PIL004) Update(dt float64, mind characters.MindInput) {
 func NewPIL004() Scene {
 
 	base := maps.NewMapFromFile("/maps/base.json")
-	room := base.Locations["personal-space-1"]
+	room := base.Locations["to-earth"]
 
 	return &PIL004{
 		ground: base,

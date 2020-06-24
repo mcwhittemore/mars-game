@@ -111,11 +111,15 @@ func (gs *GameState) AddItem(item *items.Item) {
 	gs.items = append(gs.items, item)
 }
 
-func (gs *GameState) GetItems(rect pixel.Rect) []*items.Item {
+func (gs *GameState) GetItems(rect pixel.Rect, matcher func(*items.Item) pixel.Rect) []*items.Item {
 	match := make([]*items.Item, 0)
 
 	for _, item := range gs.items {
 		ir := item.PosBounds(item.Pos)
+
+		if matcher != nil {
+			ir = matcher(item)
+		}
 
 		ol := rect.Intersect(ir)
 		if ol.Area() > 0 {
