@@ -81,9 +81,10 @@ const (
 	Crop_Sheet ItemSheet = iota
 	Wall_Sheet
 	Conveyor_Sheet
+	Spacesheet_Sheet
 )
 
-var itemsDB = make(map[int]Item)
+var itemsDB = make([]Item, 0)
 var itemIdxByName = make(map[string]int)
 
 var cropSheet sheet.Sheet
@@ -110,54 +111,65 @@ func init() {
 	}
 	ItemSheets = append(ItemSheets, conveyorSheet)
 
-	itemsDB[0] = Item{
-		Type:  Seed_Type,
-		Name:  "Corn Seed",
-		Class: "Corn",
-		Sheet: Crop_Sheet,
-		Icon:  [2]float64{5, 0},
+	spaceshipSheet, err := sheet.NewSheet("spaceship.png", pixel.Vec{X: 96, Y: 96}, pixel.ZV, sheet.TileSize*3)
+	if err != nil {
+		panic(err)
 	}
+	ItemSheets = append(ItemSheets, spaceshipSheet)
 
-	itemsDB[1] = Item{
-		Type:  Plant_Type,
-		Name:  "Corn Plant",
-		Class: "Corn",
-		Sheet: Crop_Sheet,
-		Icon:  [2]float64{4, 0},
-	}
-
-	itemsDB[2] = Item{
-		Type:  Crop_Type,
-		Name:  "Corn",
-		Class: "Corn",
-		Sheet: Crop_Sheet,
-		Icon:  [2]float64{0, 0},
-	}
+	addCrop(0, "Corn")
 
 	addItems(3, 3, 2, Wall_Sheet, Structure_Type, "Cinder Block", "Cinder Block %d")
 
 	addItems(4, 1, 0, Conveyor_Sheet, Structure_Type, "Conveyor Belt", "Conveyor Belt %d")
+
+	addItems(1, 1, 0, Spacesheet_Sheet, Structure_Type, "Spaceship", "Spaceship")
 
 	for i, item := range itemsDB {
 		itemIdxByName[item.Name] = i
 	}
 }
 
+func addCrop(row float64, class string) {
+	itemsDB = append(itemsDB, Item{
+		Type:  Seed_Type,
+		Name:  class + " Seed",
+		Class: class,
+		Sheet: Crop_Sheet,
+		Icon:  [2]float64{5, row},
+	})
+
+	itemsDB = append(itemsDB, Item{
+		Type:  Plant_Type,
+		Name:  class + " Plant",
+		Class: class,
+		Sheet: Crop_Sheet,
+		Icon:  [2]float64{4, row},
+	})
+
+	itemsDB = append(itemsDB, Item{
+		Type:  Crop_Type,
+		Name:  class,
+		Class: class,
+		Sheet: Crop_Sheet,
+		Icon:  [2]float64{0, row},
+	})
+}
+
 func addItems(rows, cols, offset float64, sheet ItemSheet, t ItemType, class string, nameF string) {
-	s := len(itemsDB)
 	i := 0
 	for x := float64(0); x < cols; x++ {
 		for y := float64(0); y < rows; y++ {
 			if y == 0 && x > cols-offset {
 				continue
 			}
-			itemsDB[s+i] = Item{
+			itemsDB = append(itemsDB, Item{
 				Type:  t,
 				Name:  fmt.Sprintf(nameF, i),
 				Class: class,
 				Sheet: sheet,
 				Icon:  [2]float64{x, y},
-			}
+			})
 			i++
 		}
 	}
