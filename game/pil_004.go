@@ -38,6 +38,11 @@ func (g *PIL004) Enter(mi characters.MindInput) {
 	mi.AddCharacter("rando-1", nil)
 	mi.ShowCharacter("rando-1", characters.NewRando(92, lp.Center().Add(pixel.V(sheet.TileSize, 0))))
 
+	hero := mi.GetCharacter("hero")
+	for i := 0; i < 10; i++ {
+		hero.AddItem("Corn")
+	}
+
 	file, err := data.Open("/items/base-structure.json")
 	items := make([]*items.Item, 0)
 

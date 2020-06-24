@@ -50,7 +50,27 @@ func ControlSpaceship(item *Item, dt float64, mi MindInput) ItemState {
 
 	if mode == Spaceship_Loading {
 		dur += dt
-		if dur > 5 {
+
+		pzVerts := mi.GetLocation("to-earth-cb-3").Vertices()
+
+		on := pixel.Rect{
+			Min: pzVerts[0].Sub(pixel.V(0, sheet.TileSize)),
+			Max: pzVerts[3],
+		}
+
+		items := mi.GetItems(on, func(t *Item) pixel.Rect {
+			if t.Type == Structure_Type {
+				return pixel.ZR
+			}
+
+			return t.PosBounds(t.Pos)
+		})
+
+		if len(items) > 0 {
+			t := items[0]
+			item.State.Data["item_"+t.Name]++
+			mi.RemoveItem(t)
+		} else if dur > 15 {
 			mode = Spaceship_Launching
 			dur = 0
 		}
