@@ -45,10 +45,14 @@ func (item *Item) SetPos(pos pixel.Vec) {
 }
 
 func (item *Item) PosBounds(pos pixel.Vec) pixel.Rect {
-	sprite, im := item.GetSprite()
+	/*sprite, im := item.GetSprite()
 	bds := sprite.Frame()
 	bds.Min = im.Project(bds.Min)
 	bds.Max = im.Project(bds.Max)
+	*/
+
+	bds := GetSheet(item.Sheet).Bounds()
+
 	w := (bds.Max.X - bds.Min.X) / 2
 	h := (bds.Max.Y - bds.Min.Y) / 2
 

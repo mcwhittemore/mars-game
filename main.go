@@ -2,8 +2,8 @@ package main
 
 import (
 	"app/game"
+	"app/perf"
 
-	"fmt"
 	"os"
 	"time"
 
@@ -56,20 +56,14 @@ func run() {
 		panic("Unexpected game trying to load: " + id)
 	}
 
-	var (
-		frames = 0
-		second = time.Tick(time.Second)
-	)
-
 	last := time.Now()
+
+	perfOn := false
+	if os.Getenv("PERFON") != "" {
+		perfOn = true
+	}
+
 	for !win.Closed() {
-		frames++
-		select {
-		case <-second:
-			win.SetTitle(fmt.Sprintf("%s | FPS: %d", cfg.Title, frames))
-			frames = 0
-		default:
-		}
 
 		dt := time.Since(last).Seconds()
 		last = time.Now()
@@ -79,6 +73,9 @@ func run() {
 		gs.Render(win)
 
 		win.Update()
+		if perfOn {
+			perf.Update()
+		}
 	}
 }
 

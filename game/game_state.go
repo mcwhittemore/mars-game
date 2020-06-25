@@ -56,22 +56,26 @@ func (gs *GameState) Update(dt float64) {
 
 func (gs *GameState) Render(win *pixelgl.Window) {
 	campos := gs.sceneManager.Current.GetCamera()
-	cam := pixel.IM.Moved(gs.win.Bounds().Center().Sub(campos))
+	bds := gs.win.Bounds()
+	wbds := bds.Moved(campos).Moved(pixel.V(bds.W()/-2, bds.H()/-2))
+	cam := pixel.IM.Moved(bds.Moved(campos.Scaled(-1)).Center())
 	gs.win.SetMatrix(cam)
 
 	activeMap := gs.sceneManager.Current.GetMap()
 	activeMap.Render.Draw(win)
 
 	wallsBatch := items.ItemSheets[items.Wall_Sheet].GetBatch()
-	//wallsBatch := pixel.NewBatch(&pixel.TrianglesData{}, items.GetSheet(items.Wall_Sheet))
 	for _, item := range gs.items {
-		sprite, im := item.GetSprite()
-		matrix := im.Moved(item.Pos)
+		ibds := item.PosBounds(item.Pos)
+		if ibds.Intersects(wbds) {
+			sprite, im := item.GetSprite()
+			matrix := im.Moved(item.Pos)
 
-		if item.Sheet == items.Wall_Sheet {
-			sprite.Draw(wallsBatch, matrix)
-		} else {
-			sprite.Draw(win, matrix)
+			if item.Sheet == items.Wall_Sheet {
+				sprite.Draw(wallsBatch, matrix)
+			} else {
+				sprite.Draw(win, matrix)
+			}
 		}
 	}
 	wallsBatch.Draw(win)
@@ -116,11 +120,13 @@ func (gs *GameState) AddItem(item *items.Item) {
 func (gs *GameState) GetItems(rect pixel.Rect, matcher func(*items.Item) pixel.Rect) []*items.Item {
 	match := make([]*items.Item, 0)
 
+	var ir pixel.Rect
 	for _, item := range gs.items {
-		ir := item.PosBounds(item.Pos)
 
 		if matcher != nil {
 			ir = matcher(item)
+		} else {
+			ir = item.PosBounds(item.Pos)
 		}
 
 		ol := rect.Intersect(ir)
