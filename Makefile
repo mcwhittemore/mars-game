@@ -14,3 +14,7 @@ downloads:
 perf: build
 	PERFON=true ./mars-game-osx > frames.csv
 	go tool pprof -svg cpuperf-0.perf
+
+world:
+	go run main.go world-builder ./maps/base.json ./items/base-structure.json
+	make files
