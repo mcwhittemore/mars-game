@@ -12,11 +12,17 @@ import (
 	"github.com/faiface/pixel/text"
 )
 
+type CanvasWithPos struct {
+	Canvas *pixelgl.Canvas
+	Pos    pixel.Vec
+}
+
 type GameState struct {
 	characters   map[string]*characters.CharacterData
 	items        []*items.Item
 	draws        []*imdraw.IMDraw
 	texts        []*text.Text
+	canvasList   []*CanvasWithPos
 	sceneManager *SceneManager
 	gameTime     float64
 	win          *pixelgl.Window
@@ -54,10 +60,16 @@ func (gs *GameState) Update(dt float64) {
 	gs.sceneManager.Current.Update(dt, gs)
 }
 
+func (gs *GameState) GetWindowBounds() pixel.Rect {
+	campos := gs.sceneManager.Current.GetCamera()
+	bds := gs.win.Bounds()
+	return bds.Moved(campos).Moved(pixel.V(bds.W()/-2, bds.H()/-2))
+}
+
 func (gs *GameState) Render(win *pixelgl.Window) {
 	campos := gs.sceneManager.Current.GetCamera()
 	bds := gs.win.Bounds()
-	wbds := bds.Moved(campos).Moved(pixel.V(bds.W()/-2, bds.H()/-2))
+	wbds := gs.GetWindowBounds()
 	cam := pixel.IM.Moved(bds.Moved(campos.Scaled(-1)).Center())
 	gs.win.SetMatrix(cam)
 
@@ -92,9 +104,14 @@ func (gs *GameState) Render(win *pixelgl.Window) {
 		text.Draw(win, pixel.IM)
 	}
 
+	for _, cwp := range gs.canvasList {
+		cwp.Canvas.Draw(win, pixel.IM.Moved(cwp.Pos))
+	}
+
 	// keeps cap but sets len to 0
 	gs.draws = gs.draws[:0]
 	gs.texts = gs.texts[:0]
+	gs.canvasList = gs.canvasList[:0]
 }
 
 /*
@@ -103,6 +120,18 @@ func (gs *GameState) Render(win *pixelgl.Window) {
 
 func (gs *GameState) GetTime() float64 {
 	return gs.gameTime
+}
+
+func (gs *GameState) AddCanvas(canvas *pixelgl.Canvas, pos pixel.Vec) {
+	gs.canvasList = append(gs.canvasList, &CanvasWithPos{
+		Canvas: canvas,
+		Pos:    pos,
+	})
+}
+
+func (gs *GameState) AddCanvasStatic(canvas *pixelgl.Canvas, pos pixel.Vec) {
+	wbds := gs.GetWindowBounds()
+	gs.AddCanvas(canvas, pos.Add(wbds.Min))
 }
 
 func (gs *GameState) AddDraw(imd *imdraw.IMDraw) {
