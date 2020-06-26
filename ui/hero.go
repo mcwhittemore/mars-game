@@ -2,9 +2,11 @@ package ui
 
 import (
 	"app/characters"
+	"app/fonts"
 	"app/items"
 	"app/sheet"
 
+	"fmt"
 	"image/color"
 
 	"github.com/faiface/pixel"
@@ -31,9 +33,11 @@ func DrawHeroItemsUI(mi characters.MindInput) {
 		spot := (loc * sheet.TileSize) + (padding * loc)
 
 		pos := pixel.V(spot+padding, padding)
+		count := 0
 		if i >= 0 && i < len(hero.Items) {
 			ci := hero.Items[i]
 			item := items.NewItem(ci.Name, pos, "")
+			count = ci.Count
 			sprite, im := item.GetSprite()
 			sprite.Draw(canvas, im.Scaled(pixel.ZV, 2).Moved(pos.Add(pixel.V(24, 24))))
 		}
@@ -41,11 +45,12 @@ func DrawHeroItemsUI(mi characters.MindInput) {
 		if i == hero.InHands {
 			imd.Color = pixel.RGB(1, 0, 0)
 		} else {
-
 			imd.Color = pixel.RGB(1, 1, 1)
 		}
 		imd.Push(pos, pos.Add(pixel.V(sheet.TileSize, sheet.TileSize)))
 		imd.Rectangle(2)
+		txt := fonts.NewText(fmt.Sprintf("%d", count), pos.Add(pixel.V(3, 3)))
+		txt.Draw(canvas, pixel.IM)
 	}
 
 	imd.Draw(canvas)
