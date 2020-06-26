@@ -15,7 +15,9 @@ import (
 )
 
 func eTagHeroItemUI(mi characters.MindInput) string {
-	return "try"
+	hero := mi.GetCharacter("hero")
+	return hero.ItemsEtag
+
 }
 
 func drawHeroItemsUI(mi characters.MindInput) (*pixelgl.Canvas, pixel.Vec) {

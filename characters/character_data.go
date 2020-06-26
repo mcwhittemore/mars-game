@@ -1,6 +1,9 @@
 package characters
 
 import (
+	"fmt"
+	"math/rand"
+
 	"github.com/faiface/pixel/pixelgl"
 )
 
@@ -12,6 +15,7 @@ type CharacterItem struct {
 type CharacterData struct {
 	Name      string
 	Character *Character
+	ItemsEtag string
 	Items     []CharacterItem
 	InHands   int
 }
@@ -29,6 +33,7 @@ func (cd *CharacterData) Render(win *pixelgl.Window) {
 }
 
 func (cd *CharacterData) AddItem(name string) {
+	cd.ItemsEtag = fmt.Sprintf("%d", rand.Int())
 	for i, ci := range cd.Items {
 		if ci.Name == name {
 			cd.Items[i].Count++
@@ -46,6 +51,7 @@ func (cd *CharacterData) AddItem(name string) {
 }
 
 func (cd *CharacterData) RemoveItem(name string) {
+	cd.ItemsEtag = fmt.Sprintf("%d", rand.Int())
 	for i, ci := range cd.Items {
 		if ci.Name == name {
 			cd.Items[i].Count--
