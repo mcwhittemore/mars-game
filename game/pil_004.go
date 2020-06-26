@@ -6,6 +6,7 @@ import (
 	"app/items"
 	"app/maps"
 	"app/sheet"
+	"app/ui"
 
 	"encoding/json"
 	"io/ioutil"
@@ -65,9 +66,11 @@ func (g *PIL004) Exit(mi characters.MindInput) {
 	mi.HideCharacter("hero")
 }
 
-func (g *PIL004) Update(dt float64, mind characters.MindInput) {
-	hp := mind.GetHeroPos()
-	mind.KeepInView(hp, 200)
+func (g *PIL004) Update(dt float64, mi characters.MindInput) {
+	hp := mi.GetHeroPos()
+	mi.KeepInView(hp, 200)
+
+	ui.DrawHeroItemsUI(mi)
 }
 
 func NewPIL004() Scene {

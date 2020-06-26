@@ -3,6 +3,7 @@ package items
 import (
 	"app/sheet"
 
+	"fmt"
 	"strings"
 
 	"github.com/faiface/pixel"
@@ -89,6 +90,23 @@ func ControlSpaceship(item *Item, dt float64, mi MindInput) ItemState {
 	}
 
 	if mode == Spaceship_Waiting {
+
+		if dur == 0 {
+			money := float64(0)
+			newData := make(map[string]float64)
+			for key, val := range item.State.Data {
+				if strings.HasPrefix(key, "item_") {
+					money += val
+				} else {
+					newData[key] = val
+				}
+			}
+			newData["money"] = money
+
+			fmt.Println(item.State.Data, newData)
+			item.State.Data = newData
+		}
+
 		dur += dt
 		if dur > 30 {
 			mode = Spaceship_Landing
@@ -114,8 +132,8 @@ func ControlSpaceship(item *Item, dt float64, mi MindInput) ItemState {
 }
 
 func spaceshipNextItem(data map[string]float64) (string, string) {
-	for key, _ := range data {
-		if strings.HasPrefix(key, "item_") {
+	for key, val := range data {
+		if strings.HasPrefix(key, "item_") && val > 0 {
 			return strings.TrimPrefix(key, "item_"), key
 		}
 	}

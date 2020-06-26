@@ -37,12 +37,18 @@ func NewHeroDefault(pos pixel.Vec) *Character {
 					cd.AddItem(myItem)
 				}
 			}
-		} else if mi.JustPressed(pixelgl.KeyK) && cd.InHands != "" {
+		} else if mi.JustPressed(pixelgl.KeyK) && cd.InHands != -1 {
 			dir := c.GetDirection()
 			tp := c.Pos.Add(dir.Scaled(sheet.TileSize))
-			item := items.DropItem(cd.InHands, tp)
+			item := items.DropItem(cd.Items[cd.InHands].Name, tp)
 			mi.AddItem(item)
-			cd.RemoveItem(cd.InHands)
+			cd.RemoveItem(cd.Items[cd.InHands].Name)
+		} else if mi.JustPressed(pixelgl.KeyH) {
+			max := len(cd.Items) - 1
+			cd.InHands--
+			if cd.InHands < 0 {
+				cd.InHands = max
+			}
 		}
 
 		if mi.Pressed(pixelgl.KeyD) || mi.Pressed(pixelgl.KeyA) || mi.Pressed(pixelgl.KeyS) || mi.Pressed(pixelgl.KeyW) {
