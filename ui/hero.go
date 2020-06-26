@@ -14,7 +14,11 @@ import (
 	"github.com/faiface/pixel/pixelgl"
 )
 
-func DrawHeroItemsUI(mi characters.MindInput) {
+func eTagHeroItemUI(mi characters.MindInput) string {
+	return "try"
+}
+
+func drawHeroItemsUI(mi characters.MindInput) (*pixelgl.Canvas, pixel.Vec) {
 	numItems := float64(5)
 	padding := float64(5)
 	w := float64((sheet.TileSize * numItems) + (padding * (numItems + 1)))
@@ -57,5 +61,6 @@ func DrawHeroItemsUI(mi characters.MindInput) {
 
 	bds := mi.GetWindowBounds()
 	x := bds.W() / 2
-	mi.AddCanvasStatic(canvas, pixel.V(x, h/2))
+
+	return canvas, pixel.V(x, h/2)
 }

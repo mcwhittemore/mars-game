@@ -70,7 +70,7 @@ func (g *PIL004) Update(dt float64, mi characters.MindInput) {
 	hp := mi.GetHeroPos()
 	mi.KeepInView(hp, 200)
 
-	ui.DrawHeroItemsUI(mi)
+	ui.Draw(ui.ItemsUI, mi)
 }
 
 func NewPIL004() Scene {
