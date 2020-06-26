@@ -29,6 +29,7 @@ func Draw(id UIElement, mi characters.MindInput) {
 	etag := ele.ComputeETag(mi)
 
 	if etag != ele.Etag {
+		ele.Etag = etag
 		ele.Canvas, ele.Pos = ele.Generator(mi)
 	}
 
