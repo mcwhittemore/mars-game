@@ -384,6 +384,7 @@ func NewWorldBuilder() Scene {
 	buildingNames := items.GetClassNames("Cinder Block")
 	buildingNames = append(buildingNames, items.GetClassNames("Conveyor Belt")...)
 	buildingNames = append(buildingNames, "Spaceship")
+	buildingNames = append(buildingNames, "Landing Pad")
 
 	mapOne := maps.NewMap(opts)
 

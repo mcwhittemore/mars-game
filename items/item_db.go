@@ -87,6 +87,7 @@ const (
 	Wall_Sheet
 	Conveyor_Sheet
 	Spacesheet_Sheet
+	LandingPad_Sheet
 )
 
 var itemsDB = make([]Item, 0)
@@ -120,6 +121,12 @@ func init() {
 	}
 	ItemSheets = append(ItemSheets, spaceshipSheet)
 
+	landingPadSheet, err := sheet.NewSheet("landing-pad.png", pixel.Vec{X: 96, Y: 96}, pixel.ZV, sheet.TileSize*9)
+	if err != nil {
+		panic(err)
+	}
+	ItemSheets = append(ItemSheets, landingPadSheet)
+
 	addCrop(0, "Corn")
 
 	addItems(3, 3, 2, Wall_Sheet, Structure_Type, "Cinder Block", "Cinder Block %d")
@@ -127,6 +134,8 @@ func init() {
 	addItems(4, 1, 0, Conveyor_Sheet, Structure_Type, "Conveyor Belt", "Conveyor Belt %d")
 
 	addItems(1, 1, 0, Spacesheet_Sheet, Structure_Type, "Spaceship", "Spaceship")
+
+	addItems(1, 1, 0, LandingPad_Sheet, Structure_Type, "Landing Pad", "Landing Pad")
 
 	for i, item := range itemsDB {
 		itemIdxByName[item.Name] = i
