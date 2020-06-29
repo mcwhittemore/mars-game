@@ -7,6 +7,10 @@ import (
 
 type MindFunc func(*Item, float64, MindInput)
 
+type Target interface {
+	SetPos(pixel.Vec)
+}
+
 type MindInput interface {
 	JustPressed(pixelgl.Button) bool
 	Pressed(pixelgl.Button) bool
@@ -14,6 +18,8 @@ type MindInput interface {
 	IsObstacle(pixel.Vec) bool
 	GetHeroPos() pixel.Vec
 	AddItem(*Item)
-	GetItem(pixel.Vec) *Item
+	GetLocation(string) pixel.Rect
+	GetItems(pixel.Rect, func(*Item) pixel.Rect) []*Item
+	GetTime() float64
 	RemoveItem(*Item)
 }

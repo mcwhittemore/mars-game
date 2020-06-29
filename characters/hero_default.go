@@ -2,8 +2,8 @@ package characters
 
 import (
 	"app/items"
+	"app/sheet"
 
-	"fmt"
 	"time"
 
 	"github.com/faiface/pixel"
@@ -25,20 +25,30 @@ func NewHeroDefault(pos pixel.Vec) *Character {
 			c.ChangePose("up")
 		} else if mi.JustPressed(pixelgl.KeyJ) {
 			dir := c.GetDirection()
-			tp := c.Pos.Add(dir.Scaled(64))
-			fmt.Println(dir, tp)
-			item := mi.GetItem(tp)
-			myItem := items.PickUpItem(item)
-			if myItem != "" {
-				mi.RemoveItem(item)
-				cd.AddItem(myItem)
+			tp := c.Pos.Add(dir.Scaled(sheet.TileSize))
+			itemList := mi.GetItems(pixel.Rect{
+				Min: tp,
+				Max: tp.Add(pixel.V(1, 1)),
+			}, nil)
+			if len(itemList) > 0 {
+				myItem := items.PickUpItem(itemList[0])
+				if myItem != "" {
+					mi.RemoveItem(itemList[0])
+					cd.AddItem(myItem)
+				}
 			}
-		} else if mi.JustPressed(pixelgl.KeyK) && cd.InHands != "" {
+		} else if mi.JustPressed(pixelgl.KeyK) && cd.InHands != -1 {
 			dir := c.GetDirection()
-			tp := c.Pos.Add(dir.Scaled(64))
-			item := items.DropItem(cd.InHands, tp)
+			tp := c.Pos.Add(dir.Scaled(sheet.TileSize))
+			item := items.DropItem(cd.Items[cd.InHands].Name, tp)
 			mi.AddItem(item)
-			cd.RemoveItem(cd.InHands)
+			cd.RemoveItem(cd.Items[cd.InHands].Name)
+		} else if mi.JustPressed(pixelgl.KeyH) {
+			max := len(cd.Items) - 1
+			cd.InHands--
+			if cd.InHands < 0 {
+				cd.InHands = max
+			}
 		}
 
 		if mi.Pressed(pixelgl.KeyD) || mi.Pressed(pixelgl.KeyA) || mi.Pressed(pixelgl.KeyS) || mi.Pressed(pixelgl.KeyW) {

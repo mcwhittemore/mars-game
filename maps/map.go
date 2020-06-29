@@ -1,26 +1,38 @@
 package maps
 
 import (
+	"app/data"
 	"app/sheet"
 
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/faiface/pixel"
 )
 
-type Tile [2]float64
-
 type MapOpts struct {
-	Sheet     *sheet.Sheet
-	Tiles     []*Tile
-	TileTypes []int
+	Sheet     string
 	Grid      [][]int
+	Locations map[string]pixel.Rect
 }
 
 type Map struct {
 	Render    *pixel.Batch
+	Locations map[string]pixel.Rect
 	tileDim   float64
 	gridTypes [][]int
+}
+
+func (m *Map) GetLocationAt(pos pixel.Vec) (string, pixel.Rect) {
+
+	for name, rect := range m.Locations {
+		if rect.Contains(pos) {
+			return name, rect
+		}
+	}
+
+	return "", pixel.ZR
 }
 
 func (m *Map) IsObstacle(pos pixel.Vec) bool {
@@ -38,24 +50,46 @@ func (m *Map) IsObstacle(pos pixel.Vec) bool {
 	return false
 }
 
+func NewMapFromFile(path string) *Map {
+	opts := &MapOpts{}
+	file, err := data.Open(path)
+	if err != nil {
+		panic(err)
+	}
+
+	b, err := ioutil.ReadAll(file)
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal(b, opts)
+	if err != nil {
+		panic(err)
+	}
+
+	return NewMap(opts)
+}
+
 func NewMap(opts *MapOpts) *Map {
 
-	dim := opts.Sheet.GetDim()
+	sheet := sheet.GetTileSheet(opts.Sheet)
+
+	dim := sheet.Sheet.GetDim()
 
 	sprites := make([]*pixel.Sprite, 0)
 
-	ttlen := len(opts.TileTypes)
-	tlen := len(opts.Tiles)
+	ttlen := len(sheet.TileTypes)
+	tlen := len(sheet.Tiles)
 
 	if ttlen != tlen {
 		panic(fmt.Sprintf("Expected Tiles (%d) and TileTypes (%d) to have the same length", tlen, ttlen))
 	}
 
-	for _, tile := range opts.Tiles {
-		sprites = append(sprites, opts.Sheet.GetSprite(tile[0], tile[1]))
+	for _, tile := range sheet.Tiles {
+		sprites = append(sprites, sheet.Sheet.GetSprite(tile[0], tile[1]))
 	}
 
-	batch := opts.Sheet.GetBatch()
+	batch := sheet.Sheet.GetBatch()
 
 	right := pixel.Vec{X: dim, Y: 0}
 
@@ -67,9 +101,21 @@ func NewMap(opts *MapOpts) *Map {
 		rowTypes := make([]int, len(row))
 		gridTypes[y] = rowTypes
 		for x, tileId := range row {
-			rowTypes[x] = opts.TileTypes[tileId]
-			sprites[tileId].Draw(batch, opts.Sheet.IM().Moved(place))
+			rowTypes[x] = sheet.TileTypes[tileId]
+			sprites[tileId].Draw(batch, sheet.Sheet.IM().Moved(place))
 			place = place.Add(right)
+		}
+	}
+
+	locs := make(map[string]pixel.Rect)
+	if opts.Locations != nil {
+		for name, loc := range opts.Locations {
+			lMin := loc.Min.Scaled(dim).Sub(pixel.V(dim/2, dim/2))
+			lMax := loc.Max.Scaled(dim).Sub(pixel.V(dim/2, dim/2))
+			locs[name] = pixel.Rect{
+				Max: lMax,
+				Min: lMin,
+			}
 		}
 	}
 
@@ -77,6 +123,7 @@ func NewMap(opts *MapOpts) *Map {
 		Render:    batch,
 		tileDim:   dim,
 		gridTypes: gridTypes,
+		Locations: locs,
 	}
 
 }

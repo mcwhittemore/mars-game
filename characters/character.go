@@ -3,8 +3,6 @@ package characters
 import (
 	"app/sheet"
 
-	//	"math"
-
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
 )
@@ -21,7 +19,7 @@ var characterSheet *sheet.Sheet
 
 func init() {
 	var err error
-	characterSheet, err = sheet.NewSheet("characters.png", pixel.Vec{X: 18, Y: 20}, pixel.Vec{X: 0, Y: 2}, 64)
+	characterSheet, err = sheet.NewSheet("characters.png", pixel.Vec{X: 18, Y: 20}, pixel.Vec{X: 0, Y: 2}, sheet.TileSize)
 	if err != nil {
 		panic(err)
 	}
