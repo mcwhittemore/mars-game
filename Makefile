@@ -1,10 +1,7 @@
-files:
-	node data/build.js ./*.png ./maps/*.json ./items/*.json
-
-run: files
+run: 
 	go run main.go
 
-build: files
+build:
 	go build -o mars-game-osx main.go
 	appify -name "Mars Game" -icon ./icon.png ./mars-game-osx
 
@@ -14,7 +11,3 @@ downloads:
 perf: build
 	PERFON=true ./mars-game-osx > frames.csv
 	go tool pprof -svg cpuperf-0.perf
-
-world:
-	go run main.go world-builder ./maps/base.json ./items/base-structure.json
-	make files
