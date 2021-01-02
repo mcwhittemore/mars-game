@@ -19,12 +19,12 @@ func NewBuild(p, s pixel.Vec, c color.Color) *Build {
 	imd := imdraw.New(nil)
 
 	b := Build{
-		pos:   p,
 		size:  s,
 		color: c,
 		imd:   imd,
 	}
 
+	b.Move(p)
 	b.rect()
 	return &b
 }
@@ -34,8 +34,10 @@ func (b *Build) Draw(w *pixelgl.Window) {
 }
 
 func (b *Build) Move(p pixel.Vec) {
-	if p.Eq(b.pos) == false {
-		b.pos = p
+	m := 10.0
+	v := p.Scaled(1.0 / m).Floor().Scaled(m)
+	if v.Eq(b.pos) == false {
+		b.pos = v
 		b.rect()
 	}
 }
