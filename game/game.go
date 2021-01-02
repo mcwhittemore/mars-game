@@ -29,13 +29,43 @@ func NewGame(w *pixelgl.Window) *Game {
 	return &g
 }
 
+func (g *Game) FindBuildByPos(p pixel.Vec) int {
+	for i, b := range g.builds {
+		if b.At(p) {
+			return i
+		}
+	}
+	return -1
+}
+
+func (g *Game) RemoveBuild(i int) {
+	s := g.builds
+	s[len(s)-1], s[i] = s[i], s[len(s)-1]
+	g.builds = s[:len(s)-1]
+}
+
+func (g *Game) AddBuild(p pixel.Vec) bool {
+	for _, b := range g.builds {
+		if b.At(p) {
+			return false
+		}
+	}
+	nb := NewBuild(g.win.MousePosition(), pixel.V(10, 10), pixel.RGB(0, 1, 0))
+	g.builds = append(g.builds, nb)
+	return true
+}
+
 func (g *Game) Draw(dt float64) {
 	g.win.Clear(colornames.Gray)
 	g.imd.Clear()
 
 	if g.win.JustPressed(pixelgl.MouseButton1) {
-		b := NewBuild(g.win.MousePosition(), pixel.V(10, 10), pixel.RGB(0, 1, 0))
-		g.builds = append(g.builds, b)
+		b := g.FindBuildByPos(g.win.MousePosition())
+		if b > -1 {
+			g.RemoveBuild(b)
+		} else {
+			g.AddBuild(g.win.MousePosition())
+		}
 	}
 
 	for _, b := range g.builds {
