@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/faiface/pixel"
@@ -10,14 +9,20 @@ import (
 	"golang.org/x/image/colornames"
 )
 
+var (
+	MOUSE_CLICK_TIME = 0.3
+)
+
 type Game struct {
-	win     *pixelgl.Window
-	camPos  pixel.Vec
-	camZoom float64
-	imd     *imdraw.IMDraw
-	mouse   *Build
-	buildId int
-	builds  []*Build
+	win           *pixelgl.Window
+	camPos        pixel.Vec
+	camZoom       float64
+	mouseDownTime float64
+	dragPos       pixel.Vec
+	imd           *imdraw.IMDraw
+	mouse         *Build
+	buildId       int
+	builds        []*Build
 }
 
 func NewGame(w *pixelgl.Window) *Game {
@@ -25,13 +30,15 @@ func NewGame(w *pixelgl.Window) *Game {
 	mc := pixel.RGB(1, 0, 0).Mul(pixel.Alpha(.3))
 	mouse := NewBuild(w.MousePosition(), pixel.V(1, 1), mc)
 	g := Game{
-		win:     w,
-		imd:     imd,
-		mouse:   mouse,
-		buildId: 0,
-		builds:  make([]*Build, 0),
-		camPos:  pixel.ZV,
-		camZoom: 10.0,
+		win:           w,
+		imd:           imd,
+		mouseDownTime: 100.0,
+		mouse:         mouse,
+		dragPos:       pixel.ZV,
+		buildId:       0,
+		builds:        make([]*Build, 0),
+		camPos:        pixel.ZV,
+		camZoom:       10.0,
 	}
 	return &g
 }
@@ -72,13 +79,39 @@ func (g *Game) MousePosition() pixel.Vec {
 	return cam.Unproject(g.win.MousePosition()).Floor()
 }
 
+func (g *Game) MouseClicked() bool {
+	if g.win.JustPressed(pixelgl.MouseButton1) {
+		g.mouseDownTime = 0
+	}
+
+	return g.win.JustReleased(pixelgl.MouseButton1) && g.mouseDownTime < MOUSE_CLICK_TIME
+}
+
+func (g *Game) MouseDrag() pixel.Vec {
+	if g.mouseDownTime > MOUSE_CLICK_TIME && g.win.Pressed(pixelgl.MouseButton1) {
+		dp := g.win.MousePosition().Scaled(1 / g.camZoom)
+		out := g.dragPos.Sub(dp)
+		g.dragPos = dp
+		return out
+	} else {
+		g.dragPos = g.win.MousePosition().Scaled(1 / g.camZoom)
+		return pixel.ZV
+	}
+}
+
 func (g *Game) Draw(dt float64) {
+	g.mouseDownTime += dt
+	md := g.MouseDrag()
+	if md.Eq(pixel.ZV) == false {
+		g.camPos = g.camPos.Add(md)
+	}
+
 	cam := g.Cam()
 	g.win.SetMatrix(cam)
 	g.win.Clear(colornames.Gray)
 	g.imd.Clear()
 
-	if g.win.JustPressed(pixelgl.MouseButton1) {
+	if g.MouseClicked() {
 		b := g.FindBuildByPos(g.MousePosition())
 		if b > -1 {
 			g.RemoveBuild(b)
@@ -95,7 +128,6 @@ func (g *Game) Draw(dt float64) {
 		} else if g.camZoom > 20 {
 			g.camZoom = 20
 		}
-		fmt.Printf("Scroll: %f, %f\n", ms.Y, g.camZoom)
 	}
 
 	for _, b := range g.builds {
