@@ -34,16 +34,12 @@ func (b *Build) Draw(w *pixelgl.Window) {
 }
 
 func (b *Build) At(p pixel.Vec) bool {
-	m := 10.0
-	v := p.Scaled(1.0 / m).Floor().Scaled(m)
-	return v.Eq(b.pos)
+	return p.Eq(b.pos)
 }
 
 func (b *Build) Move(p pixel.Vec) {
-	m := 10.0
-	v := p.Scaled(1.0 / m).Floor().Scaled(m)
-	if v.Eq(b.pos) == false {
-		b.pos = v
+	if p.Eq(b.pos) == false {
+		b.pos = p
 		b.rect()
 	}
 }
