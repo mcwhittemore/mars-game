@@ -33,8 +33,26 @@ func (b *Build) Draw(w *pixelgl.Window) {
 	b.imd.Draw(w)
 }
 
-func (b *Build) At(p pixel.Vec) bool {
-	return p.Eq(b.pos)
+func (b *Build) Bounds() pixel.Rect {
+	return pixel.Rect{
+		Min: b.pos,
+		Max: b.pos.Add(b.size),
+	}
+}
+
+func (b *Build) Contains(p pixel.Vec) bool {
+	bds := b.Bounds()
+	if bds.Area() == 1 {
+		return p.Eq(b.pos)
+	}
+	return bds.Contains(p.Sub(pixel.V(.01, .01)))
+}
+
+func (b *Build) Resize(p pixel.Vec) {
+	if p.Eq(b.size) == false {
+		b.size = p
+		b.rect()
+	}
 }
 
 func (b *Build) Move(p pixel.Vec) {
