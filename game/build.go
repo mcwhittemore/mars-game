@@ -15,6 +15,10 @@ type Build struct {
 	imd   *imdraw.IMDraw
 }
 
+func NewCell(p pixel.Vec, c color.Color) *Build {
+	return NewBuild(p, pixel.V(1, 1), c)
+}
+
 func NewBuild(p, s pixel.Vec, c color.Color) *Build {
 	imd := imdraw.New(nil)
 
@@ -38,6 +42,10 @@ func (b *Build) Bounds() pixel.Rect {
 		Min: b.pos,
 		Max: b.pos.Add(b.size),
 	}
+}
+
+func (b *Build) Center() pixel.Vec {
+	return b.Bounds().Center()
 }
 
 func (b *Build) Contains(p pixel.Vec) bool {

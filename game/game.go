@@ -21,7 +21,7 @@ type Game struct {
 	dragPos       pixel.Vec
 	imd           *imdraw.IMDraw
 	mouse         *Build
-	area          *Build
+	network       *Network
 	buildId       int
 	builds        []*Build
 }
@@ -31,14 +31,13 @@ func NewGame(w *pixelgl.Window) *Game {
 	mc := pixel.RGB(1, 0, 0).Mul(pixel.Alpha(.3))
 	mouse := NewBuild(w.MousePosition(), pixel.V(1, 1), mc)
 
-	ac := pixel.RGB(0, 0, 1).Mul(pixel.Alpha(.3))
-	area := NewBuild(pixel.ZV, pixel.V(1, 1), ac)
+	network := NewNetwork()
 	g := Game{
 		win:           w,
 		imd:           imd,
 		mouseDownTime: 100.0,
 		mouse:         mouse,
-		area:          area,
+		network:       network,
 		dragPos:       pixel.ZV,
 		buildId:       0,
 		builds:        make([]*Build, 0),
@@ -98,35 +97,6 @@ func (g *Game) MouseDrag() pixel.Vec {
 	}
 }
 
-func (g *Game) UpdateNetwork() {
-	bds := pixel.ZR
-
-	for _, b := range g.builds {
-		buildBds := b.Bounds()
-		if bds.Min.X > buildBds.Min.X {
-			bds.Min.X = buildBds.Min.X
-		}
-		if bds.Min.Y > buildBds.Min.Y {
-			bds.Min.Y = buildBds.Min.Y
-		}
-
-		if bds.Max.X < buildBds.Max.X {
-			bds.Max.X = buildBds.Max.X
-		}
-		if bds.Max.Y < buildBds.Max.Y {
-			bds.Max.Y = buildBds.Max.Y
-		}
-	}
-
-	bds.Min.X = bds.Min.X - 10
-	bds.Min.Y = bds.Min.Y - 10
-	bds.Max.X = bds.Max.X + 10
-	bds.Max.Y = bds.Max.Y + 10
-
-	g.area.Move(bds.Min)
-	g.area.Resize(bds.Max.Sub(bds.Min))
-}
-
 func (g *Game) Draw(dt float64) {
 	g.mouseDownTime += dt
 	md := g.MouseDrag()
@@ -143,10 +113,10 @@ func (g *Game) Draw(dt float64) {
 		b := g.FindBuildByPos(g.MousePosition())
 		if b > -1 {
 			g.RemoveBuild(b)
-			g.UpdateNetwork()
+			g.network.Update(g.builds)
 		} else {
 			g.AddBuild(g.MousePosition())
-			g.UpdateNetwork()
+			g.network.Update(g.builds)
 		}
 	}
 
@@ -165,7 +135,7 @@ func (g *Game) Draw(dt float64) {
 	}
 	g.mouse.Move(g.MousePosition())
 	g.mouse.Draw(g.win)
-	g.area.Draw(g.win)
+	g.network.Draw(g.win)
 
 	g.win.Update()
 }
