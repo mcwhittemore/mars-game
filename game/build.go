@@ -70,6 +70,15 @@ func (b *Build) Move(p pixel.Vec) {
 	}
 }
 
+func (b *Build) Color(c color.Color) {
+	cr, cg, cb, ca := c.RGBA()
+	br, bg, bb, ba := b.color.RGBA()
+	if cr != br || cg != bg || cb != bb || ca != ba {
+		b.color = c
+		b.rect()
+	}
+}
+
 func (b *Build) rect() {
 	b.imd.Clear()
 	b.imd.Color = b.color
