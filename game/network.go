@@ -2,7 +2,6 @@ package game
 
 import (
 	"fmt"
-	"math"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
@@ -64,35 +63,61 @@ func (n *Network) updateArea(builds []*Build) {
 	n.area = bds
 }
 
-func (n *Network) makePath(a, b *Build, min pixel.Vec) []pixel.Vec {
-	out := make([]pixel.Vec, 0)
-	ac := a.Center()
-	bc := b.Center()
+type Pos struct {
+	X int
+	Y int
+}
 
-	d := ac.Sub(bc).Floor()
-	s := d.ScaledXY(d.Map(func(v float64) float64 {
-		if v == 0 {
-			return 0
-		}
-		return 1.0 / math.Abs(v)
-	})).Floor()
-	c := pixel.ZV
+func PosFromVec(p pixel.Vec) Pos {
+	p = p.Floor()
+	return Pos{
+		X: int(p.X),
+		Y: int(p.Y),
+	}
+}
+
+func (p Pos) Sub(b Pos) Pos {
+	return Pos{
+		X: p.X - b.X,
+		Y: p.Y - b.Y,
+	}
+}
+
+func (n *Network) makePath(ac, bc Pos) []Pos {
+	out := make([]Pos, 0)
+
+	d := ac.Sub(bc)
+	s := Pos{
+		X: 1,
+		Y: 1,
+	}
+	if d.X < 0 {
+		s.X = -1
+	}
+	if d.Y < 0 {
+		s.Y = -1
+	}
+
+	c := Pos{
+		X: 0,
+		Y: 0,
+	}
 
 	c.X += s.X
 	for c.X != d.X {
-		out = append(out, ac.Sub(c).Floor().Sub(min))
+		out = append(out, ac.Sub(c))
 		c.X += s.X
 	}
 
 	for c.Y != d.Y {
-		out = append(out, ac.Sub(c).Floor().Sub(min))
+		out = append(out, ac.Sub(c))
 		c.Y += s.Y
 	}
 
 	return out
 }
 
-func (n *Network) buildCells(builds []*Build) [][]int {
+func (n *Network) buildCells(builds []*Build, min pixel.Vec) [][]int {
 	cells := make([][]int, int(n.area.W()))
 	for i := 0; i < int(n.area.W()); i++ {
 		cells[i] = make([]int, int(n.area.H()))
@@ -101,9 +126,9 @@ func (n *Network) buildCells(builds []*Build) [][]int {
 	l := len(builds)
 	for i := 0; i < l-1; i++ {
 		for j := i + 1; j < l; j++ {
-			pts := n.makePath(builds[i], builds[j], n.area.Min)
+			pts := n.makePath(PosFromVec(builds[i].Center().Sub(min)), PosFromVec(builds[j].Center().Sub(min)))
 			for _, p := range pts {
-				cells[int(p.X)][int(p.Y)]++
+				cells[p.X][p.Y]++
 			}
 		}
 	}
@@ -117,7 +142,7 @@ func (n *Network) updatePaths(builds []*Build) {
 		return
 	}
 
-	cells := n.buildCells(builds)
+	cells := n.buildCells(builds, n.area.Min)
 
 	h := 0
 	w := len(n.grid)
