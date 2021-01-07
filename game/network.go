@@ -76,6 +76,38 @@ func PosFromVec(p pixel.Vec) Pos {
 	}
 }
 
+func (p Pos) Eq(a Pos) bool {
+	return p.X == a.X && p.Y == a.Y
+}
+
+func (p Pos) Up() Pos {
+	return Pos{
+		X: p.X,
+		Y: p.Y - 1,
+	}
+}
+
+func (p Pos) Down() Pos {
+	return Pos{
+		X: p.X,
+		Y: p.Y + 1,
+	}
+}
+
+func (p Pos) Left() Pos {
+	return Pos{
+		X: p.X - 1,
+		Y: p.Y,
+	}
+}
+
+func (p Pos) Right() Pos {
+	return Pos{
+		X: p.X + 1,
+		Y: p.Y,
+	}
+}
+
 func (p Pos) Sub(b Pos) Pos {
 	return Pos{
 		X: p.X - b.X,
@@ -117,23 +149,152 @@ func (n *Network) makePath(ac, bc Pos) []Pos {
 	return out
 }
 
+func isPath(a Pos, cells [][]int) bool {
+	return cells[a.X][a.Y] > 0
+}
+
+func noLoop(a []Pos, l Pos) bool {
+	for _, p := range a {
+		if p.Eq(l) {
+			return false
+		}
+	}
+	return true
+}
+
+func checkAndAdd(q [][]Pos, p []Pos, e Pos, cells [][]int) ([][]Pos, bool, []Pos) {
+	done := false
+
+	last := p[len(p)-1]
+
+	win := make([]Pos, 0)
+
+	up := last.Up()
+	if isPath(up, cells) && noLoop(p, up) {
+		q = append(q, append(p, up))
+		if up.Eq(e) {
+			win = append(p, up)
+			done = true
+		}
+	}
+
+	down := last.Down()
+	if isPath(down, cells) && noLoop(p, down) {
+		q = append(q, append(p, down))
+		if down.Eq(e) {
+			win = append(p, down)
+			done = true
+		}
+	}
+
+	left := last.Left()
+	if isPath(left, cells) && noLoop(p, left) {
+		q = append(q, append(p, left))
+		if left.Eq(e) {
+			win = append(p, left)
+			done = true
+		}
+	}
+
+	right := last.Right()
+	if isPath(right, cells) && noLoop(p, right) {
+		q = append(q, append(p, right))
+		if right.Eq(e) {
+			win = append(p, right)
+			done = true
+		}
+	}
+
+	return q, done, win
+
+}
+
+func splitOffShortest(q [][]Pos) ([][]Pos, []Pos) {
+	idx := 0
+	s := len(q[idx])
+
+	l := len(q)
+	for i := 1; i < l; i++ {
+		if s > len(q[i]) {
+			idx = i
+			s = len(q[i])
+		}
+	}
+
+	short := q[idx]
+
+	q[idx] = q[l-1]
+	return q[:l-1], short
+}
+
+func findWinner(q [][]Pos, b Pos) []Pos {
+	for _, p := range q {
+		if p[len(p)-1].Eq(b) {
+			return p
+		}
+	}
+	panic("There should always be a winner")
+}
+
+func (n *Network) shortestPath(a, b Pos, cells [][]int) []Pos {
+
+	cells[b.X][b.Y]++
+
+	p := make([]Pos, 1)
+	p[0] = a
+	q, done, win := checkAndAdd(make([][]Pos, 0), p, b, cells)
+
+	var short []Pos
+	for done == false {
+		q, short = splitOffShortest(q)
+		q, done, win = checkAndAdd(q, short, b, cells)
+		fmt.Printf("Q: %d\n", len(q))
+		if len(q) == 0 {
+			fmt.Printf("Fail: %v, %v\n", a, b)
+			return n.makePath(a, b)
+		}
+	}
+
+	if len(win) == 0 {
+		panic("why no winner?")
+	}
+
+	return win
+}
+
 func (n *Network) buildCells(builds []*Build, min pixel.Vec) [][]int {
 	cells := make([][]int, int(n.area.W()))
+	result := make([][]int, len(cells))
 	for i := 0; i < int(n.area.W()); i++ {
 		cells[i] = make([]int, int(n.area.H()))
+		result[i] = make([]int, len(cells[i]))
+	}
+
+	pos := make([]Pos, len(builds))
+	for i, b := range builds {
+		pos[i] = PosFromVec(b.Center().Sub(min))
 	}
 
 	l := len(builds)
 	for i := 0; i < l-1; i++ {
 		for j := i + 1; j < l; j++ {
-			pts := n.makePath(PosFromVec(builds[i].Center().Sub(min)), PosFromVec(builds[j].Center().Sub(min)))
+			pts := n.makePath(pos[i], pos[j])
 			for _, p := range pts {
 				cells[p.X][p.Y]++
 			}
 		}
 	}
 
-	return cells
+	for i := 0; i < l-1; i++ {
+		for j := i + 1; j < l; j++ {
+			pts := n.shortestPath(pos[i], pos[j], cells)
+			for _, p := range pts {
+				result[p.X][p.Y]++
+			}
+		}
+	}
+
+	return result
 }
 
 func (n *Network) updatePaths(builds []*Build) {
