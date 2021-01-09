@@ -136,7 +136,7 @@ func (p Pos) Sub(b Pos) Pos {
 	}
 }
 
-func (n *Network) makePath(ac, bc Pos) Line {
+func (n *Network) makeLine(ac, bc Pos) Line {
 	out := make(Line, 0)
 
 	d := ac.Sub(bc)
@@ -176,7 +176,7 @@ func inGrid(a Pos, cells [][]int) bool {
 	if a.Y < 0 || a.Y >= len(cells[0]) {
 		return false
 	}
-	return cells[a.X][a.Y] > 0
+	return true
 }
 
 func makeLine(p Line, e, n Pos, cells [][]int) (Line, bool, bool) {
@@ -226,8 +226,25 @@ func continueLine(p Line, e Pos, cells [][]int, maxLen int) ([]Line, bool, Line)
 
 }
 
-func score(l Line, cells [][]int) int {
-	return len(l)
+func abs(v int) int {
+	if v < 0 {
+		return v * -1
+	}
+	return v
+}
+
+func scoreLine(l Line, cells [][]int) int {
+	s := 0
+
+	for _, p := range l {
+		if cells[p.X][p.Y] != 1 {
+			s += 10
+		} else {
+			s++
+		}
+	}
+
+	return s
 }
 
 func splitOffShortest(q []Line, cells [][]int) ([]Line, Line) {
@@ -236,7 +253,7 @@ func splitOffShortest(q []Line, cells [][]int) ([]Line, Line) {
 
 	l := len(q)
 	for i := 1; i < l; i++ {
-		is := score(q[i], cells)
+		is := scoreLine(q[i], cells)
 		if s > is {
 			idx = i
 			s = is
@@ -296,6 +313,7 @@ func (n *Network) buildCells(builds []*Build, min pixel.Vec) [][]int {
 		result[i] = make([]int, len(cells[i]))
 	}
 
+	l := len(builds)
 	pos := make(Line, len(builds))
 	for i, b := range builds {
 		p := PosFromVec(b.Center().Sub(min))
@@ -303,26 +321,12 @@ func (n *Network) buildCells(builds []*Build, min pixel.Vec) [][]int {
 		pos[i] = p
 	}
 
-	l := len(builds)
-	for i := 0; i < l-1; i++ {
-		for j := i + 1; j < l; j++ {
-			pts := n.makePath(pos[i], pos[j])
-			for _, p := range pts {
-				cells[p.X][p.Y]++
-			}
-		}
-	}
-
 	maxLen := int(n.area.W() + n.area.H())
-	created := 0
-	fallbacks := 0
 	for i := 0; i < l-1; i++ {
 		for j := i + 1; j < l; j++ {
-			created++
 			pts := n.shortestPath(pos[i], pos[j], cells, maxLen)
 			if len(pts) == 0 {
-				fallbacks++
-				pts = n.makePath(pos[i], pos[j])
+				fmt.Println("Zero", pos[i], pos[j])
 			}
 			for _, p := range pts {
 				result[p.X][p.Y]++
@@ -330,7 +334,7 @@ func (n *Network) buildCells(builds []*Build, min pixel.Vec) [][]int {
 		}
 	}
 
-	fmt.Printf("End buildCells, %d/%d\n", fallbacks, created)
+	fmt.Println("End buildCells")
 	return result
 }
 
