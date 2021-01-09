@@ -63,6 +63,18 @@ func (n *Network) updateArea(builds []*Build) {
 	n.area = bds
 }
 
+type Line []Pos
+
+func (l Line) Contains(p Pos) bool {
+	for _, a := range l {
+		if a.Eq(p) {
+			return true
+		}
+	}
+
+	return false
+}
+
 type Pos struct {
 	X int
 	Y int
@@ -80,17 +92,26 @@ func (p Pos) Eq(a Pos) bool {
 	return p.X == a.X && p.Y == a.Y
 }
 
+func (p Pos) Adjacent() []Pos {
+	out := make([]Pos, 4)
+	out[0] = p.Up()
+	out[1] = p.Right()
+	out[2] = p.Down()
+	out[3] = p.Left()
+	return out
+}
+
 func (p Pos) Up() Pos {
 	return Pos{
 		X: p.X,
-		Y: p.Y - 1,
+		Y: p.Y + 1,
 	}
 }
 
 func (p Pos) Down() Pos {
 	return Pos{
 		X: p.X,
-		Y: p.Y + 1,
+		Y: p.Y - 1,
 	}
 }
 
@@ -115,8 +136,8 @@ func (p Pos) Sub(b Pos) Pos {
 	}
 }
 
-func (n *Network) makePath(ac, bc Pos) []Pos {
-	out := make([]Pos, 0)
+func (n *Network) makePath(ac, bc Pos) Line {
+	out := make(Line, 0)
 
 	d := ac.Sub(bc)
 	s := Pos{
@@ -135,10 +156,9 @@ func (n *Network) makePath(ac, bc Pos) []Pos {
 		Y: 0,
 	}
 
-	c.X += s.X
 	for c.X != d.X {
-		out = append(out, ac.Sub(c))
 		c.X += s.X
+		out = append(out, ac.Sub(c))
 	}
 
 	for c.Y != d.Y {
@@ -149,58 +169,55 @@ func (n *Network) makePath(ac, bc Pos) []Pos {
 	return out
 }
 
-func isPath(a Pos, cells [][]int) bool {
+func inGrid(a Pos, cells [][]int) bool {
+	if a.X < 0 || a.X >= len(cells) {
+		return false
+	}
+	if a.Y < 0 || a.Y >= len(cells[0]) {
+		return false
+	}
 	return cells[a.X][a.Y] > 0
 }
 
-func noLoop(a []Pos, l Pos) bool {
-	for _, p := range a {
-		if p.Eq(l) {
-			return false
+func makeLine(p Line, e, n Pos, cells [][]int) (Line, bool, bool) {
+	l := append(p, n)
+	if inGrid(n, cells) && p.Contains(n) == false {
+		if n.Eq(e) {
+			return l, true, true
+		} else {
+			return l, true, false
 		}
+	} else {
+		return l, false, false
 	}
-	return true
 }
 
-func checkAndAdd(q [][]Pos, p []Pos, e Pos, cells [][]int) ([][]Pos, bool, []Pos) {
+func addToList(q []Line, l Line) []Line {
+	ll := make(Line, len(l))
+	copy(ll, l)
+	return append(q, ll)
+}
+
+func continueLine(p Line, e Pos, cells [][]int, maxLen int) ([]Line, bool, Line) {
+	q := make([]Line, 0)
 	done := false
 
 	last := p[len(p)-1]
 
-	win := make([]Pos, 0)
+	win := make(Line, 0)
 
-	up := last.Up()
-	if isPath(up, cells) && noLoop(p, up) {
-		q = append(q, append(p, up))
-		if up.Eq(e) {
-			win = append(p, up)
-			done = true
-		}
+	if len(p) > maxLen {
+		return q, done, win
 	}
 
-	down := last.Down()
-	if isPath(down, cells) && noLoop(p, down) {
-		q = append(q, append(p, down))
-		if down.Eq(e) {
-			win = append(p, down)
-			done = true
+	locs := last.Adjacent()
+	for _, np := range locs {
+		nl, onGrid, winner := makeLine(p, e, np, cells)
+		if onGrid {
+			q = addToList(q, nl)
 		}
-	}
-
-	left := last.Left()
-	if isPath(left, cells) && noLoop(p, left) {
-		q = append(q, append(p, left))
-		if left.Eq(e) {
-			win = append(p, left)
-			done = true
-		}
-	}
-
-	right := last.Right()
-	if isPath(right, cells) && noLoop(p, right) {
-		q = append(q, append(p, right))
-		if right.Eq(e) {
-			win = append(p, right)
+		if winner {
+			win = nl
 			done = true
 		}
 	}
@@ -209,15 +226,20 @@ func checkAndAdd(q [][]Pos, p []Pos, e Pos, cells [][]int) ([][]Pos, bool, []Pos
 
 }
 
-func splitOffShortest(q [][]Pos) ([][]Pos, []Pos) {
+func score(l Line, cells [][]int) int {
+	return len(l)
+}
+
+func splitOffShortest(q []Line, cells [][]int) ([]Line, Line) {
 	idx := 0
 	s := len(q[idx])
 
 	l := len(q)
 	for i := 1; i < l; i++ {
-		if s > len(q[i]) {
+		is := score(q[i], cells)
+		if s > is {
 			idx = i
-			s = len(q[i])
+			s = is
 		}
 	}
 
@@ -227,42 +249,46 @@ func splitOffShortest(q [][]Pos) ([][]Pos, []Pos) {
 	return q[:l-1], short
 }
 
-func findWinner(q [][]Pos, b Pos) []Pos {
-	for _, p := range q {
-		if p[len(p)-1].Eq(b) {
-			return p
+func maybeAddToQueue(q []Line, l Line) bool {
+	end := l[len(l)-1]
+	for _, a := range q {
+		if a.Contains(end) {
+			return false
 		}
 	}
-	panic("There should always be a winner")
+	return true
 }
 
-func (n *Network) shortestPath(a, b Pos, cells [][]int) []Pos {
+func (n *Network) shortestPath(a, b Pos, cells [][]int, maxLen int) Line {
 
 	cells[b.X][b.Y]++
 
-	p := make([]Pos, 1)
+	p := make(Line, 1)
 	p[0] = a
-	q, done, win := checkAndAdd(make([][]Pos, 0), p, b, cells)
+	q, done, win := continueLine(p, b, cells, maxLen)
 
-	var short []Pos
+	var short Line
+	var newLines []Line
 	for done == false {
-		q, short = splitOffShortest(q)
-		q, done, win = checkAndAdd(q, short, b, cells)
-		fmt.Printf("Q: %d\n", len(q))
-		if len(q) == 0 {
-			fmt.Printf("Fail: %v, %v\n", a, b)
-			return n.makePath(a, b)
-		}
-	}
+		q, short = splitOffShortest(q, cells)
+		newLines, done, win = continueLine(short, b, cells, maxLen)
 
-	if len(win) == 0 {
-		panic("why no winner?")
+		for _, nl := range newLines {
+			if maybeAddToQueue(q, nl) {
+				q = append(q, nl)
+			}
+		}
+
+		if len(q) == 0 {
+			return win
+		}
 	}
 
 	return win
 }
 
 func (n *Network) buildCells(builds []*Build, min pixel.Vec) [][]int {
+	fmt.Println("Start buildCells")
 	cells := make([][]int, int(n.area.W()))
 	result := make([][]int, len(cells))
 	for i := 0; i < int(n.area.W()); i++ {
@@ -270,9 +296,11 @@ func (n *Network) buildCells(builds []*Build, min pixel.Vec) [][]int {
 		result[i] = make([]int, len(cells[i]))
 	}
 
-	pos := make([]Pos, len(builds))
+	pos := make(Line, len(builds))
 	for i, b := range builds {
-		pos[i] = PosFromVec(b.Center().Sub(min))
+		p := PosFromVec(b.Center().Sub(min))
+		cells[p.X][p.Y]++
+		pos[i] = p
 	}
 
 	l := len(builds)
@@ -285,15 +313,24 @@ func (n *Network) buildCells(builds []*Build, min pixel.Vec) [][]int {
 		}
 	}
 
+	maxLen := int(n.area.W() + n.area.H())
+	created := 0
+	fallbacks := 0
 	for i := 0; i < l-1; i++ {
 		for j := i + 1; j < l; j++ {
-			pts := n.shortestPath(pos[i], pos[j], cells)
+			created++
+			pts := n.shortestPath(pos[i], pos[j], cells, maxLen)
+			if len(pts) == 0 {
+				fallbacks++
+				pts = n.makePath(pos[i], pos[j])
+			}
 			for _, p := range pts {
 				result[p.X][p.Y]++
 			}
 		}
 	}
 
+	fmt.Printf("End buildCells, %d/%d\n", fallbacks, created)
 	return result
 }
 
