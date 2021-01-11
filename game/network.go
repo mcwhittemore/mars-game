@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
@@ -63,112 +64,6 @@ func (n *Network) updateArea(builds []*Build) {
 	n.area = bds
 }
 
-type Line []Pos
-
-func (l Line) Contains(p Pos) bool {
-	for _, a := range l {
-		if a.Eq(p) {
-			return true
-		}
-	}
-
-	return false
-}
-
-type Pos struct {
-	X int
-	Y int
-}
-
-func PosFromVec(p pixel.Vec) Pos {
-	p = p.Floor()
-	return Pos{
-		X: int(p.X),
-		Y: int(p.Y),
-	}
-}
-
-func (p Pos) Eq(a Pos) bool {
-	return p.X == a.X && p.Y == a.Y
-}
-
-func (p Pos) Adjacent() []Pos {
-	out := make([]Pos, 4)
-	out[0] = p.Up()
-	out[1] = p.Right()
-	out[2] = p.Down()
-	out[3] = p.Left()
-	return out
-}
-
-func (p Pos) Up() Pos {
-	return Pos{
-		X: p.X,
-		Y: p.Y + 1,
-	}
-}
-
-func (p Pos) Down() Pos {
-	return Pos{
-		X: p.X,
-		Y: p.Y - 1,
-	}
-}
-
-func (p Pos) Left() Pos {
-	return Pos{
-		X: p.X - 1,
-		Y: p.Y,
-	}
-}
-
-func (p Pos) Right() Pos {
-	return Pos{
-		X: p.X + 1,
-		Y: p.Y,
-	}
-}
-
-func (p Pos) Sub(b Pos) Pos {
-	return Pos{
-		X: p.X - b.X,
-		Y: p.Y - b.Y,
-	}
-}
-
-func (n *Network) makeLine(ac, bc Pos) Line {
-	out := make(Line, 0)
-
-	d := ac.Sub(bc)
-	s := Pos{
-		X: 1,
-		Y: 1,
-	}
-	if d.X < 0 {
-		s.X = -1
-	}
-	if d.Y < 0 {
-		s.Y = -1
-	}
-
-	c := Pos{
-		X: 0,
-		Y: 0,
-	}
-
-	for c.X != d.X {
-		c.X += s.X
-		out = append(out, ac.Sub(c))
-	}
-
-	for c.Y != d.Y {
-		out = append(out, ac.Sub(c))
-		c.Y += s.Y
-	}
-
-	return out
-}
-
 func inGrid(a Pos, cells [][]int) bool {
 	if a.X < 0 || a.X >= len(cells) {
 		return false
@@ -198,17 +93,13 @@ func addToList(q []Line, l Line) []Line {
 	return append(q, ll)
 }
 
-func continueLine(p Line, e Pos, cells [][]int, maxLen int) ([]Line, bool, Line) {
+func continueLine(p Line, e Pos, cells [][]int) ([]Line, bool, Line) {
 	q := make([]Line, 0)
 	done := false
 
 	last := p[len(p)-1]
 
 	win := make(Line, 0)
-
-	if len(p) > maxLen {
-		return q, done, win
-	}
 
 	locs := last.Adjacent()
 	for _, np := range locs {
@@ -223,7 +114,6 @@ func continueLine(p Line, e Pos, cells [][]int, maxLen int) ([]Line, bool, Line)
 	}
 
 	return q, done, win
-
 }
 
 func abs(v int) int {
@@ -234,7 +124,8 @@ func abs(v int) int {
 }
 
 func scoreLine(l Line, cells [][]int) int {
-	s := 0
+	return len(l)
+	/*s := 0
 
 	for _, p := range l {
 		if cells[p.X][p.Y] != 1 {
@@ -244,7 +135,7 @@ func scoreLine(l Line, cells [][]int) int {
 		}
 	}
 
-	return s
+	return s*/
 }
 
 func splitOffShortest(q []Line, cells [][]int) ([]Line, Line) {
@@ -276,19 +167,19 @@ func maybeAddToQueue(q []Line, l Line) bool {
 	return true
 }
 
-func (n *Network) shortestPath(a, b Pos, cells [][]int, maxLen int) Line {
+func (n *Network) shortestPath(a, b Pos, cells [][]int) Line {
 
 	cells[b.X][b.Y]++
 
 	p := make(Line, 1)
 	p[0] = a
-	q, done, win := continueLine(p, b, cells, maxLen)
+	q, done, win := continueLine(p, b, cells)
 
 	var short Line
 	var newLines []Line
 	for done == false {
 		q, short = splitOffShortest(q, cells)
-		newLines, done, win = continueLine(short, b, cells, maxLen)
+		newLines, done, win = continueLine(short, b, cells)
 
 		for _, nl := range newLines {
 			if maybeAddToQueue(q, nl) {
@@ -304,6 +195,36 @@ func (n *Network) shortestPath(a, b Pos, cells [][]int, maxLen int) Line {
 	return win
 }
 
+func findNearest(p Pos, cells [][]int) (Pos, bool) {
+	near := Pos{
+		X: len(cells),
+		Y: len(cells[0]),
+	}
+	dist := len(cells) + len(cells[0])
+	found := false
+	for x := 0; x < len(cells); x++ {
+		for y := 0; y < len(cells[x]); y++ {
+			if cells[x][y] != 2 {
+				continue
+			}
+			a := abs(x - p.X)
+			b := abs(y - p.Y)
+			if a == 0 && b == 0 {
+				continue
+			}
+			d := int(math.Sqrt(float64(a*a + b*b)))
+			if d < dist {
+				found = true
+				dist = d
+				near.X = x
+				near.Y = y
+			}
+		}
+	}
+
+	return near, found
+}
+
 func (n *Network) buildCells(builds []*Build, min pixel.Vec) [][]int {
 	fmt.Println("Start buildCells")
 	cells := make([][]int, int(n.area.W()))
@@ -317,20 +238,28 @@ func (n *Network) buildCells(builds []*Build, min pixel.Vec) [][]int {
 	pos := make(Line, len(builds))
 	for i, b := range builds {
 		p := PosFromVec(b.Center().Sub(min))
-		cells[p.X][p.Y]++
+		cells[p.X][p.Y] = 1
 		pos[i] = p
 	}
 
-	maxLen := int(n.area.W() + n.area.H())
-	for i := 0; i < l-1; i++ {
-		for j := i + 1; j < l; j++ {
-			pts := n.shortestPath(pos[i], pos[j], cells, maxLen)
-			if len(pts) == 0 {
-				fmt.Println("Zero", pos[i], pos[j])
-			}
+	if l > 1 {
+		pts := n.shortestPath(pos[0], pos[1], cells)
+		for _, p := range pts {
+			result[p.X][p.Y]++
+			cells[p.X][p.Y] = 2
+		}
+	}
+
+	for i := 2; i < l; i++ {
+		near, ok := findNearest(pos[i], cells)
+		if ok {
+			pts := n.shortestPath(pos[i], near, cells)
 			for _, p := range pts {
 				result[p.X][p.Y]++
+				cells[p.X][p.Y] = 2
 			}
+		} else {
+			panic("failed to find path target")
 		}
 	}
 
